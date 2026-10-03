@@ -2,6 +2,8 @@
 
 Status: proposed execution plan, not implemented functionality or an approved final stack. The full suite remains the target: capture, expert interview, reviewed Work Map, learner coaching, controlled execution and skill library. Build orchestration uses the current coding-agent environment; application orchestration is a separate architecture choice.
 
+Read the [requirements and acceptance contract](requirements.md) before assigning work. Map each task to requirement IDs and evidence; passing documentation checks does not establish runtime compliance.
+
 ## Proposed foundations
 
 - Native macOS capture/input/accessibility contract and companion. Compare the existing Swift sensor proposal with OpenAdapt Capture’s Python/native implementation before choosing the sensor engine.

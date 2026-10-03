@@ -10,6 +10,8 @@ The proposed product combines a macOS companion, a web workspace, voice intervie
 
 Architecture and implementation planning are in progress. A working application, installation instructions and validated integrations are not yet available. This repository does not claim completed capture, teaching or automation functionality.
 
+The [requirements and acceptance contract](docs/requirements.md) separates mandatory challenge gates, expected behavior, judging evidence and full-suite extensions. All runtime gates are currently unbuilt.
+
 A [proposed implementation plan](docs/implementation-plan.md) records the next review outputs, shared contracts and dependency-aware build tasks.
 
 ## Development
