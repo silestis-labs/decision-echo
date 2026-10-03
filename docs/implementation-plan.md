@@ -1,6 +1,6 @@
 # Decision Echo implementation plan
 
-Status: proposed execution plan, not implemented functionality or an approved final stack. The full suite remains the target: capture, expert interview, reviewed Work Map, learner coaching, controlled execution and skill library. Build orchestration uses the current coding-agent environment; application orchestration is a separate architecture choice.
+Status: implementation has started under user authorization. A connected local sandbox journey is implemented; see [implementation results](reviews/implementation-results.md) and [final engineering review](reviews/final-engineering-review.md) for actual evidence and remaining integrations. The sections below preserve the earlier proposed execution plan. The full suite remains the target: capture, expert interview, reviewed Work Map, learner coaching, controlled execution and skill library. Build orchestration uses the current coding-agent environment; application orchestration is a separate architecture choice.
 
 Read the [requirements and acceptance contract](requirements.md) before assigning work. Map each task to requirement IDs and evidence; passing documentation checks does not establish runtime compliance.
 

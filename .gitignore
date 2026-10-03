@@ -41,3 +41,9 @@ coverage/
 *.sqlite
 *.sqlite3
 *.db
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.wrangler/
+test-results/
+playwright-report/

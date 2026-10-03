@@ -1,0 +1,13 @@
+# Copy to .dev.vars; never paste credentials in chat or commit them.
+OPENAI_API_KEY=
+ELEVENLABS_API_KEY=
+ELEVENLABS_EXPERT_AGENT_ID=
+ELEVENLABS_TUTOR_AGENT_ID=
+NOTION_TOKEN=
+NOTION_DATA_SOURCE_ID=
+
+# Set MODE=live in runtime config after all integrations are configured.
+# Explicit availability: array of {person, skill:[], start, end}; offset ISO dates.
+NOTION_AVAILABILITY_JSON=[]
+# Optional exact Chrome extension origin; no wildcard.
+EXTENSION_ORIGIN=

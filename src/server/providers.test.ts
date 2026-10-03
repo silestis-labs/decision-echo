@@ -1,0 +1,10 @@
+import { describe,it,expect } from 'vitest';
+import { mapNotionPage } from './providers';
+const text=(s:string)=>({type:'rich_text',rich_text:[{plain_text:s}]});
+const select=(name:string)=>({type:'select',select:{name}});
+const date=(start:string|null)=>({type:'date',date:start?{start}:null});
+function page(){return {id:'page-1',last_edited_time:'2026-10-04T00:00:00Z',properties:{Task:{type:'title',title:[{plain_text:'Analyze'}]},'Required Skill':select('Data Analysis'),'Effort (h)':{type:'number',number:2},Deadline:date('2026-10-08T12:00:00+02:00'),Priority:select('P0 · Urgent'),'Customer Preference':select('Lea only'),'Dependency Status':select('Ready'),'Dependency Available At':date(null),Flags:{type:'multi_select',multi_select:[{name:'Focus Work'},{name:'Review Required'}]},'Proposed Assignee':select('Lea'),Start:date('2026-10-08T09:00:00+02:00'),End:date('2026-10-08T11:00:00+02:00'),'Review Owner':select('Mira'),'Review Start':date(null),'Review End':date(null),'Follow-up Owner':text('Jonas'),'Follow-up Checkpoint':date(null),Decision:select('Schedule')}}}
+describe('actual Notion sandbox property mapping',()=>{
+ it('maps select priorities, Flags and scheduling properties',()=>{const task=mapNotionPage(page());expect(task.priority).toBe(0);expect(task.focus).toBe(true);expect(task.external).toBe(true);expect(task.assignee).toBe('Lea');expect(task.effort).toBe(2)});
+ it('does not silently fabricate missing constraints',()=>{const p=page();delete (p.properties as Record<string,unknown>).Deadline;expect(()=>mapNotionPage(p)).toThrow('missing property Deadline')});
+});

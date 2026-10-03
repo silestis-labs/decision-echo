@@ -80,6 +80,6 @@ Event slides list a public code/docs repository, live demo, demo video, technica
 
 ## Coverage reporting
 
-Use `not built`, `implemented but unverified`, `verified` or `blocked` per requirement, with an evidence link and map/build version. Currently all runtime gates are **not built**. Documentation completion is not functionality completion. “100% required-gate coverage” means every explicit gate has verified evidence; report expected behaviors, quality signals and stretch coverage separately. No calculated percentage should be presented as an official score.
+Use `not built`, `implemented but unverified`, `verified` or `blocked` per requirement, with an evidence link and map/build version. A connected local sandbox journey is implemented and tested; live voice/vision and Notion gate verification remain pending. See [implementation results](reviews/implementation-results.md) for evidence and limits. Documentation completion is not functionality completion. “100% required-gate coverage” means every explicit gate has verified evidence; report expected behaviors, quality signals and stretch coverage separately. No calculated percentage should be presented as an official score.
 
 See [implementation plan](implementation-plan.md), [agent bootstrap](agent-bootstrap.md) and [publication policy](publication-policy.md).

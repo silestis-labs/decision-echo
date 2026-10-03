@@ -1,0 +1,9 @@
+{
+  "$schema":"./node_modules/wrangler/config-schema.json",
+  "name":"decision-echo","main":"src/server/index.ts","compatibility_date":"2026-10-03","compatibility_flags":["nodejs_compat"],
+  "assets":{"directory":"./dist","binding":"ASSETS","not_found_handling":"single-page-application","run_worker_first":["/api/*"]},
+  "durable_objects":{"bindings":[{"name":"SESSIONS","class_name":"EchoSession"}]},
+  "migrations":[{"tag":"v1","new_sqlite_classes":["EchoSession"]}],
+  "vars":{"MODE":"sandbox","OPENAI_MODEL":"gpt-6-sol","ELEVENLABS_VOICE_MODEL":"v4-turbo","APP_ORIGIN":"http://127.0.0.1:5173"},
+  "observability":{"enabled":true}
+}

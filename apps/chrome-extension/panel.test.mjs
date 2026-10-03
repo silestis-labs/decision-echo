@@ -1,0 +1,18 @@
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const fields=new Map();
+const element=id=>{if(!fields.has(id))fields.set(id,{value:'',textContent:'',checked:false});return fields.get(id);};
+const requests=[];
+const context=vm.createContext({document:{getElementById:element},URL,AbortController,Date,console,clearInterval,setInterval,window:{addEventListener(){}},chrome:{runtime:{onMessage:{addListener(){}}},tabs:{sendMessage:async()=>{}}},fetch:async(url,options)=>{requests.push({url,options});return {ok:true,json:async()=>({epoch:7,recording:true})};}});
+vm.runInContext(readFileSync(new URL('./panel.js',import.meta.url),'utf8'),context);
+vm.runInContext("connection={base:'http://localhost:8787',id:'session',token:'memory-only'};active=true;epoch=7;",context);
+await element('stop').onclick();
+assert.equal(requests.length,2);
+const pause=JSON.parse(requests[1].options.body);
+assert.deepEqual(pause,{recording:false,epoch:7});
+assert.equal(vm.runInContext('active',context),false);
+assert.equal(requests[1].options.headers.Authorization,'Bearer memory-only');
+assert.ok(!requests[1].url.includes('memory-only'));
+for(const bad of ['https://remote.example','http://localhost@evil.example','http://localhost:8787/path','http://localhost:8787/?token=x'])assert.throws(()=>vm.runInContext(`baseURL(${JSON.stringify(bad)})`,context));
+console.log('PASS: off-record current epoch, synchronous local stop, bearer-only transfer, loopback origin validation');

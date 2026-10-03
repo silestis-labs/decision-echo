@@ -1,0 +1,8 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Decision Echo Capture</title><body>
+<h1>Capture controls</h1><p>Shares clicked control names and shortcut categories, never typed values. Select a tab explicitly. Capture stays in this panel's memory. In the workspace, explicitly reveal/copy the optional capture session capability, then enter it below. Configure the backend EXTENSION_ORIGIN to this installed extension's exact chrome-extension:// ID.</p>
+<label>Workspace (loopback only)<input id="endpoint" value="http://localhost:8787"></label><br>
+<label>Session ID<input id="session"></label><br><label>Session bearer token<input id="token" type="password" autocomplete="off"></label><br>
+<label>Allowed target origin<input id="origin" placeholder="https://www.notion.so"></label><br>
+<label><input id="frames" type="checkbox">Also capture this tab's visible screenshot every 2 seconds (may contain personal data)</label><br>
+<button id="start">Consent and capture current tab</button><button id="stop">Off record</button><p id="status" role="status">Not recording</p>
+<script src="panel.js"></script></body></html>

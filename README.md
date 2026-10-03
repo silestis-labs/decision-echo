@@ -1,25 +1,55 @@
 # Decision Echo
 
-An AI apprentice that learns expert workflows from screen recordings and voice, then guides others across desktop apps.
+An AI apprentice that captures expert decisions, builds an evidence-backed Work Map, and coaches a learner through a new case.
 
-Decision Echo is being designed for the ElevenLabs Expert Workflows challenge at HackNation. Its intended flow is to observe an expert, clarify the reasoning behind their decisions, produce an evidence-backed Work Map, and coach another person through a new case.
+The first connected implementation is a browser workspace for synthetic Notion weekly planning. Optional Chrome and macOS capture clients use the same session protocol. The architecture keeps capture, voice, learned policy and application adapters separate so additional applications can be added.
 
-The proposed product centers on a browser workspace, with optional Chrome extension and macOS companion, voice interviewing and application adapters. Notion task planning is the first intended workflow; the skill model is designed to extend to other applications.
+## Run locally
 
-## Project status
+Use Node.js 22.12+ or a supported newer release and npm.
 
-Architecture and implementation planning are in progress. A working application, installation instructions and validated integrations are not yet available. This repository does not claim completed capture, teaching or automation functionality.
+```sh
+npm ci
+npm run build
+npm run dev:api
+```
 
-The [requirements and acceptance contract](docs/requirements.md) separates mandatory challenge gates, expected behavior, judging evidence and full-suite extensions. All runtime gates are currently unbuilt.
+In a second terminal:
 
-The [platform architecture and stack recommendation](docs/platform-architecture.md) describes Cloudflare hosting, local capture, ElevenLabs voice and backend model choices.
+```sh
+npm run dev
+```
 
-A [proposed implementation plan](docs/implementation-plan.md) records the next review outputs, shared contracts and dependency-aware build tasks.
+Open http://127.0.0.1:5173. The local Cloudflare API runs on port 8787. Choose **Start sandbox session**, share a synthetic planning window, record three real expert answers including a guardrail, and answer three new debrief questions. Review and confirm the Work Map, then open the unseen learner case. Proposal checks do not write to Notion; saving requires explicit human approval.
 
-The [customer journey](docs/customer-journey.md) specifies browser-first access, expert capture/review and learner practice, including the capabilities of each optional client.
+The sandbox compiles actual entered answers into selected, supported scheduling rule types. It does not simulate a live model or invent expert answers. Changed rule parameters, such as review-buffer minutes, affect validation; arbitrary policy induction is not claimed.
 
-## Development
+## Connect live providers
 
-A primary Codex agent coordinates specialist subagents, reviews their reports and integrates their changes. Start with [CONTRIBUTING.md](CONTRIBUTING.md) for developer/agent onboarding. See [AGENTS.md](AGENTS.md) for coordination rules, [agent bootstrap](docs/agent-bootstrap.md) for other frameworks, and [publication policy](docs/publication-policy.md) for what belongs in this repository.
+Copy `.dev.vars.example` to ignored `.dev.vars` and configure credentials locally. Browser login alone does not connect the application. Configure separate ElevenLabs expert/tutor agents with the selected v4 Turbo voice model, OpenAI backend access, and a Notion connection to the demo data source. Set `MODE=live` and `APP_ORIGIN` in runtime configuration; see [server setup](docs/server-setup.md) for availability and schema configuration. Never expose API keys in the browser or commit them.
 
-Public examples and future demo data should be synthetic. Internal research, the wiki and approved source materials are versioned separately in a private knowledge repository. Credentials stay out of both repositories.
+Live provider adapters are implemented but account calls, model quality, agent configuration and Notion writes remain **unverified until credentials are configured and those tests run**. This is a working local foundation, not a completed full-suite or hackathon-compliance claim.
+
+## Verified and pending
+
+Verified locally: TypeScript, deterministic scheduling and provider-safety tests, actual local Durable Object API integration, and the browser Capture → Map → Teach → blocked proposal → correction → explicit sandbox save journey. Browser automation uses a synthetic test stream; it does not verify OS screen-sharing permissions or hardware capture. Optional extension syntax/privacy tests and the Swift package build pass.
+
+Pending: live ElevenLabs/OpenAI/Notion integration, actual native/extension permission and capture tests, multilingual tutoring, multiple-expert comparison, generalized task/person schemas, reconciliation UI, user/team authentication and deployment. Technical pre-save enforcement applies to our controlled write path; direct Notion autosave is outside it.
+
+## Checks
+
+```sh
+npm run check
+node apps/chrome-extension/panel.test.mjs
+# With both local servers running:
+node tests/api.integration.mjs
+node tests/browser.integration.mjs
+```
+
+The browser test requires a Playwright Chromium installation (`npx playwright install chromium`). [Capture clients](docs/capture-clients.md) documents installation and remaining platform limitations. [Final review](docs/reviews/final-engineering-review.md) and [implementation results](docs/reviews/implementation-results.md) separate review, build and runtime evidence.
+
+## Contribution and publication
+
+Start with [CONTRIBUTING.md](CONTRIBUTING.md), [AGENTS.md](AGENTS.md), [agent bootstrap](docs/agent-bootstrap.md) and [publication policy](docs/publication-policy.md). The coordinator owns contracts and integration; specialists receive bounded modules.
+
+The private knowledge checkout is independent of this repository. Private source materials, recordings, wiki, credentials and real workspace identifiers stay out of product history. Use synthetic data for public demonstrations.
