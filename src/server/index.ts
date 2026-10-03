@@ -86,14 +86,14 @@ export class EchoSession extends DurableObject<ServerEnv>{
   if(!frameIds.length)throw new ApiError(422,'Answer must link an actual captured frame');
   const answerEvidence={id:crypto.randomUUID(),sessionId:s.id,epoch:s.epoch,at:now(),kind:'answer' as const,text:answer.answer};s.evidence.push(answerEvidence);answer.evidenceIds=[...frameIds,answerEvidence.id];s.answers.push(answer);s.revision++;this.save(s);return Response.json(this.visible(s));
  }
- if(action==='voice'){const {role}=z.object({role:z.enum(['expert','tutor'])}).strict().parse(body);if(s.mode!=='live')throw new ApiError(409,'Sandbox has no live voice');if(role==='tutor'&&s.map?.status!=='confirmed')throw new ApiError(409,'Confirm Work Map first');if(!s.recording)throw new ApiError(409,'Start recording before voice');const epoch=s.epoch;const result=await voiceUrl(this.env,role);const current=this.load().session;if(!current.recording||current.epoch!==epoch)throw new ApiError(409,'Voice authorization became stale');return Response.json(result)}
+ if(action==='voice'){const {role}=z.object({role:z.enum(['expert','tutor'])}).strict().parse(body);if(role==='tutor'&&s.map?.status!=='confirmed')throw new ApiError(409,'Confirm Work Map first');if(!s.recording)throw new ApiError(409,'Start recording before voice');const epoch=s.epoch;const result=await voiceUrl(this.env,role);const current=this.load().session;if(!current.recording||current.epoch!==epoch)throw new ApiError(409,'Voice authorization became stale');return Response.json(result)}
  if(action==='observe'){
-  const b=z.object({epoch:z.number().int(),image:imageSchema}).strict().parse(body);if(!s.recording||b.epoch!==s.epoch)throw new ApiError(409,'Capture paused or stale');if(s.mode!=='live')throw new ApiError(409,'Sandbox does not simulate model observation');
+  const b=z.object({epoch:z.number().int(),image:imageSchema}).strict().parse(body);if(!s.recording||b.epoch!==s.epoch)throw new ApiError(409,'Capture paused or stale');
   const result=await observe(this.env,b.image);const current=this.load().session;if(!current.recording||current.epoch!==b.epoch)throw new ApiError(409,'Stale observation discarded');return Response.json(result);
  }
  if(action==='compile'){
   z.object({}).strict().parse(body);if(s.map?.status==='confirmed')throw new ApiError(409,'Confirmed map requires explicit editing before recompilation');if(s.phase==='teach')throw new ApiError(409,'Learner evidence cannot compile expert rules');assertCompile(s);if(s.recording)throw new ApiError(409,'Pause recording before compiling');
-  const revision=s.revision,epoch=s.epoch;const map=s.mode==='live'?await liveCompile(this.env,s):compileMap(s);
+  const revision=s.revision,epoch=s.epoch;const map=this.env.OPENAI_API_KEY?await liveCompile(this.env,s):compileMap(s);
   s=this.ensureCurrent(revision,epoch);s.map=map;assertMap(s);s.phase='map';s.revision++;this.save(s);return Response.json(this.visible(s));
  }
  if(action==='confirm'){

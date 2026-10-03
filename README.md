@@ -22,7 +22,7 @@ npm run dev
 
 Open http://127.0.0.1:5173. The local Cloudflare API runs on port 8787. Choose **Start sandbox session**, share a synthetic planning window, record three real expert answers including a guardrail, and answer three new debrief questions. Review and confirm the Work Map, then open the unseen learner case. Proposal checks do not write to Notion; saving requires explicit human approval.
 
-The sandbox compiles actual entered answers into selected, supported scheduling rule types. It does not simulate a live model or invent expert answers. Changed rule parameters, such as review-buffer minutes, affect validation; arbitrary policy induction is not claimed.
+Without an OpenAI key, the sandbox compiles actual entered answers into selected, supported scheduling rule types. Configured real voice and vision also work with synthetic planning data, independently of the Notion connection. It does not simulate a live model or invent expert answers. Changed rule parameters, such as review-buffer minutes, affect validation; arbitrary policy induction is not claimed.
 
 ## Connect live providers
 

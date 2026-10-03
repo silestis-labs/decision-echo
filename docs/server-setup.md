@@ -46,9 +46,9 @@ Live reads query the configured **data source**, paginate to a bounded 200 tasks
 
 ## Learning and controlled save
 
-Sandbox is explicitly synthetic; its rule compiler binds manually entered expert answers to selected supported rule types. It is not an AI training claim. The Atlas learner case stays hidden from browser session responses until Teach.
+Sandbox refers to synthetic planning data and local writes. Real ElevenLabs voice and OpenAI observation can be used with that data when their keys are configured, independently of Notion. Without a backend model key, its deterministic compiler binds manually entered expert answers to selected supported rule types. It is not an AI training claim. The Atlas learner case stays hidden from browser session responses until Teach.
 
-Live observation and compilation use actual OpenAI Responses. No model error is replaced with a supposedly learned synthetic map. Compilation supplies only captured expert evidence/answers, never the task schedule or hidden learner case. Three distinct capture answers including a guardrail and three new debrief answers are required, followed by a draft map with real evidence references and exact expert quotes. The user must explicitly confirm the exact version. Map edits invalidate confirmation.
+Configured observation and compilation use actual OpenAI Responses in either data mode. No model error is replaced with a supposedly learned synthetic map. Compilation supplies only captured expert evidence/answers, never the task schedule or hidden learner case. Three distinct capture answers including a guardrail and three new debrief answers are required, followed by a draft map with real evidence references and exact expert quotes. The user must explicitly confirm the exact version. Map edits invalidate confirmation.
 
 Pause increments the epoch. Frames have a 550KB encoded limit and a 32MB total retention budget per session, stored separately from session metadata. Frames arriving from old epochs are rejected; model observation results are discarded after an epoch change. This is a server upload/result boundary, not proof that a remote native collector stops synchronously before its next poll. The client must stop all sensors/uploads immediately on its own pause action.
 
