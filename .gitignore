@@ -1,0 +1,43 @@
+# Independent private checkout; never include it in product history
+/internal/
+
+# Private source material and working knowledge. Never commit these directories.
+/Opening/
+/Challenges/
+/raw/
+/research/
+/wiki/
+/Mentoren.md
+/scripts/wiki_lint.py
+
+# Local agent configuration and machine state
+/.codex/
+/.agents/
+/.gstack/
+.DS_Store
+
+# Credentials: examples must contain placeholders only and be reviewed
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Generated outputs and local recordings
+node_modules/
+dist/
+build/
+.build/
+target/
+__pycache__/
+*.pyc
+coverage/
+*.log
+/recordings/
+/screenshots/
+/artifacts/
+*.sqlite
+*.sqlite3
+*.db
