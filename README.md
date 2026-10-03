@@ -10,6 +10,8 @@ The proposed product combines a macOS companion, a web workspace, voice intervie
 
 Architecture and implementation planning are in progress. A working application, installation instructions and validated integrations are not yet available. This repository does not claim completed capture, teaching or automation functionality.
 
+A [proposed implementation plan](docs/implementation-plan.md) records the next review outputs, shared contracts and dependency-aware build tasks.
+
 ## Development
 
 A primary Codex agent coordinates specialist subagents, reviews their reports and integrates their changes. Start with [CONTRIBUTING.md](CONTRIBUTING.md) for developer/agent onboarding. See [AGENTS.md](AGENTS.md) for coordination rules, [agent bootstrap](docs/agent-bootstrap.md) for other frameworks, and [publication policy](docs/publication-policy.md) for what belongs in this repository.
