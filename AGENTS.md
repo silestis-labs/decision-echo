@@ -6,6 +6,10 @@ Build an extensible expert-apprentice product: capture expert work, clarify deci
 
 Use English for maintained documentation and reports. Distinguish proposals, implemented behavior and verified runtime results. Do not claim universal replay, universal autosave interception or model training from a recording.
 
+## Developer and framework onboarding
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for checkout, branches, two-repository workflow and handoff. [Agent bootstrap](docs/agent-bootstrap.md) provides an explicit framework-neutral prompt. AGENTS.md is canonical guidance, not an installed or running agent. Other frameworks must load it with their supported mechanism; wrappers should reference it rather than duplicate rules. Use available coordinator/worker tools or sequential roles, and discover actual runtime limits.
+
 ## Coordination
 
 The primary Codex agent owns requirements, dependencies, shared contracts, integration and user-facing results. Specialist subagents receive bounded assignments and report back. Respect actual runtime concurrency limits; do not assume ten human developers or ten concurrent agents.

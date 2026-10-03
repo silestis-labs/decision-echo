@@ -12,6 +12,6 @@ Architecture and implementation planning are in progress. A working application,
 
 ## Development
 
-A primary Codex agent coordinates specialist subagents, reviews their reports and integrates their changes. See [AGENTS.md](AGENTS.md) for coordination rules and [publication policy](docs/publication-policy.md) for what belongs in this repository.
+A primary Codex agent coordinates specialist subagents, reviews their reports and integrates their changes. Start with [CONTRIBUTING.md](CONTRIBUTING.md) for developer/agent onboarding. See [AGENTS.md](AGENTS.md) for coordination rules, [agent bootstrap](docs/agent-bootstrap.md) for other frameworks, and [publication policy](docs/publication-policy.md) for what belongs in this repository.
 
 Public examples and future demo data should be synthetic. Internal research, the wiki and approved source materials are versioned separately in a private knowledge repository. Credentials stay out of both repositories.
