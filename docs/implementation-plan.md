@@ -4,6 +4,8 @@ Status: proposed execution plan, not implemented functionality or an approved fi
 
 Read the [requirements and acceptance contract](requirements.md) before assigning work. Map each task to requirement IDs and evidence; passing documentation checks does not establish runtime compliance.
 
+Latest researched proposal: [Cloudflare platform architecture](platform-architecture.md). It recommends Workers, Durable Objects, Workflows, D1/R2, ElevenLabs voice and a separate backend model adapter; provisioning and final stack approval remain pending.
+
 ## Proposed foundations
 
 - Native macOS capture/input/accessibility contract and companion. Compare the existing Swift sensor proposal with OpenAdapt Capture’s Python/native implementation before choosing the sensor engine.
