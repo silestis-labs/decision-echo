@@ -6,7 +6,7 @@ Status: researched recommendation, 2026-10-04. Cloudflare is the user's likely h
 
 Decision Echo turns an expert's demonstrated work and spoken reasoning into a confirmed, evidence-backed skill, then teaches another person through a new case. The platform has six connected surfaces: Capture Studio, Expert Interviewer, Work Map Studio, Apprentice Coach, Execution Workspace and Skill Library.
 
-The web workspace contains screen sharing, voice controls, timeline, map editing, learner planning and the library. A local macOS companion enriches capture across desktop applications. Cloudflare hosts the shared backend and web assets; native screen/input capture runs on the user's device. Notion is the first application adapter. The semantic skill model remains independent of Notion page IDs, selectors and desktop coordinates.
+The [customer journey](customer-journey.md) recommends browser-first access with optional Chrome extension and Mac companion; the connected Notion journey must not require a Mac installation. The web workspace contains screen sharing, voice controls, timeline, map editing, learner planning and the library. A local macOS companion enriches capture across desktop applications. Cloudflare hosts the shared backend and web assets; native screen/input capture runs on the user's device. Notion is the first application adapter. The semantic skill model remains independent of Notion page IDs, selectors and desktop coordinates.
 
 ```mermaid
 flowchart TD
@@ -40,7 +40,7 @@ The voice service and backend coordinator have different responsibilities. Eleve
 | Cross-session data | Cloudflare D1 | Workspaces, membership, skill/map versions, references, evaluation results and adapter records. |
 | Evidence media | Private Cloudflare R2 | Scoped frames/audio evidence and exports; authenticated access, retention and deletion. Large binaries do not belong in D1. |
 | Voice | ElevenAgents + React SDK | Interviewer and tutor roles, live conversation, context updates and client tools. |
-| Speech | Requested Eleven v4 Turbo; verify Expressive Mode configuration | v4 Turbo is documented for Agents. Preserve the brief's named Expressive Mode/Scribe requirements; verify the exact combination before implementation. |
+| Speech | User-selected Eleven v4 Turbo; verify Expressive Mode configuration | v4 Turbo is documented for Agents. Preserve the brief's named Expressive Mode/Scribe requirements; verify the exact combination before implementation. |
 | Backend reasoning | OpenAI Responses API through a provider interface | Screenshot interpretation, candidate rules, gap extraction, Work Map JSON and semantic checks. |
 | Model baseline | GPT-6 Sol as an initial evaluation candidate | Officially supports image input, function calling and structured outputs. Not a benchmark winner or final pinned choice. Measure screen accuracy, latency and cost before choosing per-role models. |
 | Mac companion | Swift + SwiftUI; ScreenCaptureKit and Accessibility integration | Native permissions, selected-surface capture and scoped activity signals. Framework choice is a recommendation; permission and input-event details require native validation. |
@@ -89,6 +89,8 @@ For our actual needs, the documented **Responses API** covers model calls with i
 Prompt rules cannot be the sole before-save enforcement. A sequence such as `propose → validate → warn/correct → commit → read-back` makes the boundary inspectable. Durable Object ordering helps our state management; it is not an atomic transaction with Notion or exactly-once external execution. Use operation IDs, deduplication and reconciliation for retries. Never blindly retry a consequential write after a timeout.
 
 ## Voice configuration and operating cost
+
+The user explicitly selected Eleven v4 Turbo on 2026-10-04. This is the voice-model decision; account/runtime behavior is still unverified.
 
 v4 Turbo is officially available through ElevenAgents. The opened Expressive Mode guide still enables it by selecting **v3 Conversational** and describes Scribe v2 Realtime timing signals. This documentation mismatch needs an account/configuration check; it does not justify silently dropping Expressive Mode or promising that v4 automatically enables it. Sources: [v4 availability](https://elevenlabs.io/v4), [Expressive Mode](https://elevenlabs.io/docs/eleven-agents/customization/voice/expressive-mode).
 

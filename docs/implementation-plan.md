@@ -6,8 +6,11 @@ Read the [requirements and acceptance contract](requirements.md) before assignin
 
 Latest researched proposal: [Cloudflare platform architecture](platform-architecture.md). It recommends Workers, Durable Objects, Workflows, D1/R2, ElevenLabs voice and a separate backend model adapter; provisioning and final stack approval remain pending.
 
+Review baseline: [customer journey and product surfaces](customer-journey.md). Recommend a complete browser-accessible journey across desktop OS targets, with optional Chrome extension/native enhancement. Eleven v4 Turbo is user-selected; no compulsory Mac installation for Notion Capture → Map → Teach.
+
 ## Proposed foundations
 
+- Optional Chrome extension for supported-site side panel/context/activity, using the shared session contracts.
 - Native macOS capture/input/accessibility contract and companion. Compare the existing Swift sensor proposal with OpenAdapt Capture’s Python/native implementation before choosing the sensor engine.
 - React/TypeScript web workspace with real browser screen sharing.
 - TypeScript application service with versioned event/evidence, Work Map and adapter contracts.
