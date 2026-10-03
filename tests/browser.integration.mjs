@@ -5,11 +5,22 @@ try{
 const page=await browser.newPage({viewport:{width:1440,height:1000},timezoneId:'Europe/Berlin'});
 const errors=[];page.on('pageerror',error=>errors.push(error.message));
 // Test-only synthetic canvas replaces OS permission/capture. This does not prove hardware capture.
-await page.addInitScript(()=>{navigator.mediaDevices.getDisplayMedia=async()=>{const c=document.createElement('canvas');c.width=800;c.height=450;const ctx=c.getContext('2d');ctx.fillStyle='#f5f6fa';ctx.fillRect(0,0,800,450);ctx.fillStyle='#12213b';ctx.font='24px sans-serif';ctx.fillText('Synthetic browser integration test screen',30,50);return c.captureStream(1);};});
+await page.addInitScript(()=>{navigator.mediaDevices.getDisplayMedia=async()=>{const c=document.createElement('canvas');c.width=800;c.height=450;const ctx=c.getContext('2d');ctx.fillStyle='#f5f6fa';ctx.fillRect(0,0,800,450);ctx.fillStyle='#12213b';ctx.font='24px sans-serif';ctx.fillText('Synthetic browser integration test screen',30,50);let tick=0;setInterval(()=>{ctx.fillStyle=tick++%2?'#cc8844':'#4466aa';ctx.fillRect(700,350,50,50);},1000);return c.captureStream(2);};});
 await page.goto('http://127.0.0.1:5173');
 await page.getByRole('button',{name:'Start sandbox session →',exact:true}).click();
+await page.getByRole('button',{name:'02 Work Map',exact:true}).click();
+await expect(page.getByRole('heading',{name:'Your Work Map is not ready yet'})).toBeVisible();
+await expect(page.getByRole('textbox',{name:'New debrief question',exact:true})).toHaveCount(0);
+await page.getByRole('button',{name:'Return to Capture',exact:true}).click();
 await page.getByRole('button',{name:'Share screen',exact:true}).click();
 await page.getByRole('button',{name:'Screen moment',exact:false}).first().waitFor({timeout:12000});
+await expect(page.getByAltText('Latest captured surface preview')).toBeVisible();
+await expect.poll(async()=>new Set(await page.getByAltText('Captured screen thumbnail').evaluateAll(imgs=>imgs.map(img=>img.src))).size,{timeout:12000}).toBeGreaterThan(1);
+await page.getByRole('textbox',{name:'Screen-specific question',exact:true}).fill('Unsaved question retained on pause?');
+await page.getByRole('textbox',{name:'Expert’s own answer',exact:true}).fill('Unsaved expert answer retained on pause.');
+await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();
+await expect(page.getByRole('textbox',{name:'Expert’s own answer',exact:true})).toHaveValue('Unsaved expert answer retained on pause.');
+await page.getByRole('button',{name:'Share screen',exact:true}).click();
 for(let i=0;i<3;i++){
 await page.getByRole('textbox',{name:'Screen-specific question',exact:true}).fill(`Synthetic capture question ${i}`);
 await page.getByRole('textbox',{name:'Expert’s own answer',exact:true}).fill(`Synthetic expert test answer ${i}: protect the entire weekly schedule and avoid double bookings.`);
