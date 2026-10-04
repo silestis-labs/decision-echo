@@ -10,6 +10,31 @@ Decision Echo turns an expert's screen moments and explanations into a reviewed,
 
 The hosted demo requires the shared access code supplied separately by the team. It uses fictional planning data. Real voice and screen analysis require the configured providers and browser permissions; the access gate is not a team-account system.
 
+## See the product working
+
+**Actual application screenshots with synthetic rehearsal inputs.** These images come from a fresh isolated Capture/Map/Teach run: authored answers, a confirmed map, a blocked overlap, complete correction and explicit sandbox save. They demonstrate the rendered product and controlled policy path; this run made no voice, vision or other provider calls. [Screenshot provenance and checks](docs/reviews/jury-product-evidence-2026-10-04.md).
+
+![The controlled planner blocks Lea's overlapping assignment and explains it using the confirmed expert quote](docs/images/learner-intervention.png)
+
+<details>
+<summary>Inspect the captured answer, rule evidence and corrected result</summary>
+
+### Capture: review the answer and its screen source
+
+![Explicitly synthetic expert answer linked to a captured planning screen](docs/images/capture-review.png)
+
+### Map: the rule beside its original explanation and evidence
+
+![Confirmed rule evidence, saved expert wording and screen context in the real Work Map interface](docs/images/work-map-evidence.png)
+
+### Teach: correct the proposal, then explicitly save
+
+![The corrected saved sandbox plan passes the confirmed rules](docs/images/corrected-plan.png)
+
+</details>
+
+For actual provider and separate human microphone evidence, see the [hosted release report](docs/reviews/release-verification-2026-10-04.md). The [walkthrough](docs/demo-walkthrough.md) gives the complete rehearsal sequence.
+
 ## Decision Echo in 30 seconds
 
 An experienced planner knows why a task needs an uninterrupted block, when a customer restriction is binding, and when missing inputs mean work must stop. A recording preserves the clicks; these reasons often remain implicit. A new colleague needs both the rule and the judgment behind it when the next case differs.
@@ -153,6 +178,20 @@ The working hosted demo is supervised, with these remaining boundaries:
 The stable product flow is **observe work → clarify judgment → review evidence → practice on a new case**. Capture clients, conversational roles, learned policy and application adapters are separate components.
 
 Future adapters could apply the same flow to other browser and desktop workflows, with domain-specific decisions, exceptions and escalation. A team skill library could make reviewed expertise available across colleagues and practice cases. Those are expansion directions, not working integrations in this submission. Today's build demonstrates the connected journey in one deliberately inspectable planning domain.
+
+## Moonshot: a living company memory of expert judgment
+
+Today, one expert's reviewed decisions help a learner handle a new case. Next, teams share that evidence-backed knowledge, preserve its history and ask focused questions when work changes. The larger vision is a living company memory: people learn from reviewed judgment, and controlled agents later follow the same guardrails with human escalation.
+
+![Moonshot roadmap separating implemented workflow, proposed team memory and future controlled agents](docs/images/moonshot.png)
+
+| Horizon | Bridge from today's build | Status |
+| --- | --- | --- |
+| Today | Screen-linked answers → expert-confirmed Work Map → new learner case and controlled save. | Implemented; verification boundaries above. |
+| Next | Add team identity/sharing, historical map revisions and expert revalidation after changes. | Proposed next build. |
+| Moonshot | Reuse reviewed knowledge across workflows to teach people and guide scoped agent actions. | Future vision; agent execution is not demonstrated. |
+
+[Open the standalone closing slide](docs/pitch/moonshot.html) · [Presentation placement and spoken close](docs/pitch/README.md). This is the closing slide for the product/demo pitch. The technical video can briefly explain the architecture bridge. Skill export packages instructions and evidence; it does not establish model training or universal execution.
 
 ## Run locally
 
