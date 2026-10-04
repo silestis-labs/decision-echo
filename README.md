@@ -12,9 +12,8 @@ The hosted demo requires the shared access code supplied separately by the team.
 
 ## See the product working
 
-**Actual application screenshots with synthetic rehearsal inputs.** These images come from a fresh isolated Capture/Map/Teach run: authored answers, a confirmed map, a blocked overlap, complete correction and explicit sandbox save. They demonstrate the rendered product and controlled policy path; this run made no voice, vision or other provider calls. [Screenshot provenance and checks](docs/reviews/jury-product-evidence-2026-10-04.md).
+**Actual application screenshots with synthetic rehearsal inputs.** These images come from a fresh isolated Capture/Map/Teach run: authored answers, a confirmed map, a correction and an explicit sandbox save. They demonstrate the rendered product and controlled policy path; this run made no voice, vision or other provider calls. [Screenshot provenance and checks](docs/reviews/jury-product-evidence-2026-10-04.md).
 
-![The controlled planner blocks Lea's overlapping assignment and explains it using the confirmed expert quote](docs/images/learner-intervention.png)
 
 <details>
 <summary>Inspect the captured answer, rule evidence and corrected result</summary>
@@ -219,7 +218,6 @@ Copy `.dev.vars.example` to ignored `.dev.vars` and configure credentials locall
 | `ELEVENLABS_API_KEY`, expert and tutor agent IDs | Real interviewer/tutor conversations; configure each remote agent and voice separately. |
 | `OPENAI_API_KEY` | Model-backed Work Map compilation and learner visual coaching. |
 | Vertex authentication and selected observation configuration | Gemini screen observation; short-lived local OAuth requires refresh. |
-| `NOTION_TOKEN`, data-source ID and explicit availability | Separate live Notion adapter mode; optional for the synthetic demonstration. |
 
 Keep `MODE=sandbox` for the self-contained demo. It selects fictional task data while configured real providers remain active. Follow [server setup](docs/server-setup.md) for credential modes, property mapping and operating limits, and [ElevenLabs setup](docs/elevenlabs-agent-setup.md) for conversational roles. Keep all secrets server-side and out of Git.
 
@@ -252,7 +250,7 @@ The browser workflow requires a running UI on port 5173 and Playwright Chromium 
 | [`apps/chrome-extension/`](apps/chrome-extension/) | Optional browser capture side panel and runtime tests. |
 | [`apps/macos-companion/`](apps/macos-companion/) | Optional Swift capture companion and packaging instructions. |
 | [`tests/`](tests/) | API/browser integration and opt-in provider/capture measurements. |
-| [`docs/demo/`](docs/demo/) | Approved synthetic planning examples and Notion preparation. |
+| [`docs/demo/`](docs/demo/) | Approved synthetic planning examples. |
 | [`docs/reviews/`](docs/reviews/) | Dated implementation reviews, measurements and verification boundaries. |
 
 ## Deeper documentation and contribution
@@ -260,7 +258,7 @@ The browser workflow requires a running UI on port 5173 and Playwright Chromium 
 - [Demo walkthrough](docs/demo-walkthrough.md): synthetic expert fixture, held-out learner mistake and changed-rule comparison.
 - [Hosted release verification](docs/reviews/release-verification-2026-10-04.md): actual checks and remaining limits.
 - [Requirements](docs/requirements.md): Capture/Map/Teach acceptance contract and Apprentice Test questions.
-- [Server setup](docs/server-setup.md): session authority, provider configuration and Notion schema.
+- [Server setup](docs/server-setup.md): session authority and provider configuration.
 - [Capture clients](docs/capture-clients.md): supported paths and platform verification.
 - [Contribution guide](CONTRIBUTING.md), [agent bootstrap](docs/agent-bootstrap.md) and [publication policy](docs/publication-policy.md): development and the public/private repository boundary.
 
