@@ -19,7 +19,8 @@
     "test:voice": "node tests/voice.integration.mjs",
     "test:lease": "node tests/lease.integration.mjs",
     "test:integration": "npm run test:api && npm run test:browser && npm run test:extension && npm run test:extension:runtime",
-    "test:vision": "node tests/vision.integration.mjs"
+    "test:vision": "node tests/vision.integration.mjs",
+    "deploy": "npm run build && wrangler deploy --var APP_ORIGIN:https://decision-echo.litchis-sixty-1m.workers.dev"
   },
   "dependencies": {
     "@elevenlabs/react": "1.16.0",
