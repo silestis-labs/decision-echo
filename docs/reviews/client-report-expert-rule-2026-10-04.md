@@ -16,4 +16,11 @@ The morning proposal (Jonas Thursday08:00–12:00) fits ordinary supplied constr
 
 The deterministic fallback requires the same quoted answer to name one person and an explicit range such as13:00 to17:00. Natural-language compilation relies on model interpretation and expert parameter review. The window is a supported reviewed policy operator, not generalized learning of arbitrary company rules.
 
-No original-audio evidence playback is implemented. Evidence is screenshot and expert text. Synthetic participant voices must be labeled as reenactment; real agent output must not be fabricated. This branch retains the UI simplification and does not include the separate unapproved privacy notice branch. No hosted deployment has been performed by this change.
+No original-audio evidence playback is implemented. Evidence is screenshot and expert text. Synthetic participant voices must be labeled as reenactment; real agent output must not be fabricated. This branch retains the UI simplification and does not include the separate unapproved privacy notice branch. The hosted deployment and its limits are recorded below.
+
+
+## Hosted configuration repair
+
+The hosted screen observer failed because Vertex API-key authentication mode and project binding were missing. The deployment origin also pointed to localhost. Persisted `VERTEX_AUTH_MODE=api_key` and the hosted `APP_ORIGIN` in Wrangler configuration; supplied the project through a server-side secret binding. No credential value is committed.
+
+`npm run check` passed again (127 tests, typecheck and build). `npx wrangler deploy` published version `45e22103-1f7e-4450-924e-cfda72800eae`. Hosted configuration reports Gemini vision enabled and demo access required. A disposable authenticated synthetic session uploaded a planner screenshot and received HTTP 200 from real Gemini observation in 9.48 seconds: “Why is Finalize Client Presentation assigned to Jonas?” The test session was deleted. This verifies provider connectivity and one relevant observation, not a latency guarantee or a fresh microphone test. The separate privacy PR was excluded. Main was not merged.
