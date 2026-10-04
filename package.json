@@ -23,7 +23,7 @@
     "test:live-learning": "node tests/live-learning.integration.mjs",
     "test:live-planner": "node tests/live-planner.integration.mjs",
     "test:model-latency": "node tests/model-latency.integration.mjs",
-    "deploy": "npm run build && wrangler deploy --var APP_ORIGIN:https://decision-echo.litchis-sixty-1m.workers.dev",
+    "deploy": "npm run build && wrangler deploy --var APP_ORIGIN:https://decision-echo.litchis-sixty-1m.workers.dev --var DEMO_ACCESS_MODE:public",
     "test:voice-ui": "node tests/voice-presence.integration.mjs",
     "test:vertex-adapter": "node --test tests/vertex-adapter.test.mjs",
     "test:gemini-luna": "node tests/gemini-luna.integration.mjs",

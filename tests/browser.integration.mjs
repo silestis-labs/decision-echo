@@ -8,9 +8,30 @@ const page=await browser.newPage({viewport:{width:1440,height:1000},timezoneId:'
 const errors=[];page.on('pageerror',error=>errors.push(error.message));
 await page.route('**/api/**',route=>route.continue({url:worker.base+new URL(route.request().url()).pathname}));
 // Test-only synthetic canvas replaces OS permission/capture. This does not prove hardware capture.
-await page.addInitScript(()=>{navigator.mediaDevices.getDisplayMedia=async()=>{const c=document.createElement('canvas');c.width=800;c.height=450;const ctx=c.getContext('2d');ctx.fillStyle='#f5f6fa';ctx.fillRect(0,0,800,450);ctx.fillStyle='#12213b';ctx.font='24px sans-serif';ctx.fillText('Synthetic browser integration test screen',30,50);let tick=0;setInterval(()=>{ctx.fillStyle=tick%2?'#cc8844':'#4466aa';ctx.fillRect(700,350,50,50);ctx.fillStyle='#f5f6fa';ctx.fillRect(600,400,90,40);ctx.fillStyle='#12213b';ctx.fillText(String(tick++),610,430);},1000);const stream=c.captureStream(2);if(window.__deferCapture)await new Promise(resolve=>{window.__releaseCapture=resolve;});return stream;};});
+await page.addInitScript(()=>{navigator.mediaDevices.getDisplayMedia=async()=>{window.__captureCalls=(window.__captureCalls||0)+1;const c=document.createElement('canvas');c.width=800;c.height=450;const ctx=c.getContext('2d');ctx.fillStyle='#f5f6fa';ctx.fillRect(0,0,800,450);ctx.fillStyle='#12213b';ctx.font='24px sans-serif';ctx.fillText('Synthetic browser integration test screen',30,50);let tick=0;setInterval(()=>{ctx.fillStyle=tick%2?'#cc8844':'#4466aa';ctx.fillRect(700,350,50,50);ctx.fillStyle='#f5f6fa';ctx.fillRect(600,400,90,40);ctx.fillStyle='#12213b';ctx.fillText(String(tick++),610,430);},1000);const stream=c.captureStream(2);if(window.__deferCapture)await new Promise(resolve=>{window.__releaseCapture=resolve;});return stream;};});
 await page.goto('http://127.0.0.1:5173');
 await page.getByRole('button',{name:'Start sandbox session →',exact:true}).click();
+// The authorization declaration must precede any media request or capture upload.
+const outbound=[];page.on('request',r=>{if(/\/(recording|evidence|voice|observe|coach|answers|compile|map|validate|commit)(?:\?|$)/.test(new URL(r.url()).pathname))outbound.push(r.url());});
+await page.getByText('Recording settings',{exact:true}).click();
+await page.getByRole('button',{name:'Share screen',exact:true}).click();
+const sharingDialog=page.getByRole('dialog',{name:'Before you share',exact:true});
+await expect(sharingDialog).toBeVisible();
+await expect(page.getByRole('contentinfo',{name:'Privacy information'}).getByRole('link',{name:'Privacy Notice'})).toBeAttached();
+const declaration=sharingDialog.getByRole('checkbox');
+await expect(declaration).not.toBeChecked();
+await expect(sharingDialog.getByRole('button',{name:'Continue to screen sharing',exact:true})).toBeDisabled();
+assert.equal(await page.evaluate(()=>window.__captureCalls||0),0);
+assert.equal(outbound.length,0);
+const noticeHref=await sharingDialog.getByRole('link',{name:'Privacy Notice',exact:true}).getAttribute('href');
+const noticeResponse=await page.request.get(`http://127.0.0.1:5173${noticeHref}`);
+assert.equal(noticeResponse.status(),200);const privacyTab=await browser.newPage();await privacyTab.goto(`http://127.0.0.1:5173${noticeHref}`);await expect(privacyTab.getByRole('heading',{name:'PRIVACY NOTICE',exact:true})).toBeVisible();await expect(privacyTab.getByRole('contentinfo',{name:'Privacy information'}).getByRole('link',{name:'Privacy Notice'})).toBeVisible();await privacyTab.close();
+await declaration.check();
+await sharingDialog.getByRole('button',{name:'Cancel',exact:true}).click();
+await expect(sharingDialog).not.toBeVisible();
+assert.equal(outbound.length,0);assert.equal(await page.evaluate(()=>window.__captureCalls||0),0);
+await page.getByText('Recording settings',{exact:true}).click();
+async function approveSharing(){await expect(sharingDialog).toBeVisible();await expect(declaration).not.toBeChecked();await declaration.check();await sharingDialog.getByRole('button',{name:'Continue to screen sharing',exact:true}).click();}
 const workflow=page.getByRole('region',{name:'Learning workflow progress',exact:true});
 await expect(workflow).toContainText('guardrail still needed');
 await expect(workflow).toContainText('map not compiled');
@@ -46,8 +67,9 @@ await page.getByRole('button',{name:'▦ Table',exact:true}).click();
 await page.getByRole('button',{name:'Focus planner',exact:true}).click();
 await expect(page.getByRole('region',{name:'Session controls',exact:true})).toBeVisible();
 await expect(page.locator('.np-expanded .np-sidebar')).toBeHidden();
+await expect(page.getByRole('contentinfo',{name:'Privacy information'}).getByRole('link',{name:'Privacy Notice'})).toBeVisible();
 const railBox=await page.getByRole('region',{name:'Session controls',exact:true}).boundingBox();
-assert(railBox&&railBox.y===0&&railBox.height===1000&&railBox.x+railBox.width===1440,'Desktop session dock must span the full right edge');
+assert(railBox&&railBox.y===0&&railBox.height===966&&railBox.x+railBox.width===1440,'Desktop session dock must span the right edge above the privacy footer');
 await expect(page.getByRole('button',{name:'Start session',exact:true})).toBeVisible();
 await expect(page.locator('.np-session-rail').getByRole('status',{name:'Voice activity',exact:true})).toContainText('Voice paused');
 await page.screenshot({path:'/private/tmp/decision-echo-voice-ui.png'});
@@ -57,6 +79,7 @@ await page.setViewportSize({width:800,height:900});
 const exitBox=await page.getByRole('button',{name:'Exit full view',exact:true}).boundingBox();
 assert(exitBox&&exitBox.x+exitBox.width<=800,'Full-view exit must fit a medium-width viewport');
 await expect(page.locator('.np-expanded .np-sidebar')).toBeHidden();
+await expect(page.getByRole('contentinfo',{name:'Privacy information'}).getByRole('link',{name:'Privacy Notice'})).toBeVisible();
 await page.setViewportSize({width:390,height:844});
 await page.getByRole('button',{name:'Finalize Client Presentation',exact:true}).click();
 await expect(page.getByRole('button',{name:'◼ Off the record',exact:true})).toBeVisible();
@@ -83,7 +106,7 @@ await page.getByText('Recording settings',{exact:true}).click();
 // A picker response arriving after Off the record must stop its tracks without activating recording.
 await page.evaluate(()=>{window.__deferCapture=true;});
 await page.getByRole('button',{name:'Focus planner',exact:true}).click();
-await page.getByRole('button',{name:'Start session',exact:true}).click();
+await page.getByRole('button',{name:'Start session',exact:true}).click();await approveSharing();
 await page.waitForFunction(()=>typeof window.__releaseCapture==='function');
 await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();
 await page.evaluate(()=>{window.__deferCapture=false;window.__releaseCapture();});
@@ -94,7 +117,7 @@ await expect(page.getByText('Screen sharing stopped',{exact:true})).toBeVisible(
 // Delay capture activation to exercise Off the record while the server start is in flight.
 let releaseStart;const startBarrier=new Promise(resolve=>{releaseStart=resolve;});let sawStart;const startedRequest=new Promise(resolve=>{sawStart=resolve;});
 await page.route('**/api/sessions/*/recording',async route=>{if(route.request().postDataJSON()?.recording===true){sawStart();await startBarrier;}await route.continue();});
-await page.getByRole('button',{name:'Share screen',exact:true}).click();
+await page.getByRole('button',{name:'Share screen',exact:true}).click();await approveSharing();
 await startedRequest;
 await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();
 releaseStart();
@@ -104,7 +127,7 @@ await page.unroute('**/api/sessions/*/recording');
 const racedRef=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0]);
 const racedState=await (await page.request.get(`${worker.base}/api/sessions/${racedRef.id}`,{headers:{Authorization:`Bearer ${racedRef.token}`}})).json();
 assert.equal(racedState.recording,false,'late capture activation must be compensated after pause');
-await page.getByRole('button',{name:'Share screen',exact:true}).click();
+await page.getByRole('button',{name:'Share screen',exact:true}).click();await approveSharing();
 await page.getByRole('button',{name:'Screen moment',exact:false}).first().waitFor({timeout:12000});
 await expect(page.getByAltText('Latest captured surface preview')).toHaveCount(0);
 await page.getByRole('checkbox',{name:'Show capture preview',exact:true}).check();
@@ -117,7 +140,7 @@ await expect(page.getByRole('button',{name:'Share screen',exact:true})).toBeEnab
 const pausedEvidenceCount=await page.getByRole('button',{name:'Screen moment',exact:false}).count();
 await page.waitForTimeout(2500);
 assert.equal(await page.getByRole('button',{name:'Screen moment',exact:false}).count(),pausedEvidenceCount,'reload must pause capture and leave frame count unchanged');
-await page.getByRole('button',{name:'Share screen',exact:true}).click();
+await page.getByRole('button',{name:'Share screen',exact:true}).click();await approveSharing();
 await page.getByRole('textbox',{name:'Screen-specific question',exact:true}).fill('Unsaved question retained on pause?');
 await page.getByRole('textbox',{name:'Expert’s own answer',exact:true}).fill('Unsaved expert answer retained on pause.');
 await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();
@@ -127,7 +150,7 @@ await expect(page.locator('.banner[role="status"]')).toContainText('Session reco
 await page.getByText('Recording settings',{exact:true}).click();
 await expect(page.getByRole('button',{name:'Share screen',exact:true})).toBeEnabled();
 await expect(page.getByRole('textbox',{name:'Expert’s own answer',exact:true})).toHaveValue('');
-await page.getByRole('button',{name:'Share screen',exact:true}).click();
+await page.getByRole('button',{name:'Share screen',exact:true}).click();await approveSharing();
 for(let i=0;i<3;i++){
 if(i===0){await page.getByRole('button',{name:'Focus planner',exact:true}).click();await page.getByText('Review answer',{exact:true}).click();}
 await page.getByRole('textbox',{name:'Screen-specific question',exact:true}).fill(`Synthetic capture question ${i}`);
@@ -197,7 +220,7 @@ await page.getByRole('button',{name:'I approve · save sandbox plan',exact:true}
 await expect(page.getByRole('region',{name:'Session controls',exact:true}).getByText('Plan saved',{exact:true})).toBeVisible();
 await expect(page.getByRole('button',{name:'I approve · save sandbox plan',exact:true})).toBeDisabled();
 await page.getByRole('button',{name:'Exit full view',exact:true}).click();
-await expect(page.locator('.banner[role="status"]')).toHaveText('Sandbox proposal saved. No Notion workspace was changed.');
+await expect(page.locator('.banner[role="status"]')).toHaveText('Plan saved in your Decision Echo workspace.');
 await page.screenshot({path:'/private/tmp/decision-echo-browser-review.png',fullPage:false});
 // Mocked vision-provider UI contract test: this does not prove real model screen understanding.
 await expect(page.getByText('Visual coaching is not configured.',{exact:false})).toBeVisible();
@@ -210,7 +233,7 @@ await page.route('**/api/sessions/*/coach',route=>route.fulfill({json:mockCoach(
 await page.reload();
 await page.getByRole('button',{name:'03 Teach',exact:true}).click();
 await page.getByText('Recording settings',{exact:true}).click();
-await page.getByRole('button',{name:'Share learner screen',exact:true}).click();
+await page.getByRole('button',{name:'Share learner screen',exact:true}).click();await approveSharing();
 await expect(page.getByText('Synthetic mocked vision observation',{exact:true})).toBeVisible({timeout:15000});
 await expect(page.getByRole('button',{name:'I’m at a natural pause · discuss this frame',exact:true})).toBeDisabled();
 await page.getByRole('button',{name:'Replay original expert evidence ↗',exact:true}).first().click();
@@ -240,7 +263,7 @@ await page.reload();
 await expect(page.getByRole('heading',{name:'Saved skills in this tab'})).toBeVisible();
 await page.getByRole('button',{name:'Capture a new skill',exact:true}).click();
 await page.getByText('Optional capture companions',{exact:true}).click();
-await page.getByRole('button',{name:'Start companion capture',exact:true}).click();
+await page.getByRole('button',{name:'Start companion capture',exact:true}).click();await approveSharing();
 const ref=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0]);
 const companionHeaders={'Authorization':`Bearer ${ref.token}`,'Content-Type':'application/json'};
 const companionSession=await (await page.request.get(`${worker.base}/api/sessions/${ref.id}`,{headers:companionHeaders})).json();
@@ -276,6 +299,19 @@ assert.equal(await page.evaluate(id=>JSON.parse(sessionStorage.getItem('decision
 await page.getByRole('button',{name:'Forget this tab’s sessions',exact:true}).click();
 await expect(page.getByRole('button',{name:'Start sandbox session →',exact:true})).toBeVisible();
 assert.equal(await page.evaluate(()=>sessionStorage.getItem('decision-echo.sessions.v1')),null);
+// A fresh session after forgetting must not inherit permission for typed content upload.
+await page.getByRole('button',{name:'Start sandbox session →',exact:true}).click();
+await expect(page.getByRole('heading',{name:'Weekly planning',exact:true})).toBeVisible();
+const typedRef=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0]);
+await page.getByRole('textbox',{name:'Screen-specific question',exact:true}).fill('Synthetic typed-only question?');
+await page.getByRole('textbox',{name:'Expert’s own answer',exact:true}).fill('Synthetic typed-only answer must not transfer before acknowledgment.');
+const requestsBefore=outbound.length,capturesBefore=await page.evaluate(()=>window.__captureCalls||0);
+await page.getByRole('button',{name:'Save evidenced answer',exact:true}).click();
+await expect(sharingDialog).toBeVisible();await expect(declaration).not.toBeChecked();
+assert.equal(outbound.length,requestsBefore);assert.equal(await page.evaluate(()=>window.__captureCalls||0),capturesBefore);
+await sharingDialog.getByRole('button',{name:'Cancel',exact:true}).click();
+assert.equal(outbound.length,requestsBefore);
+await page.request.post(`${worker.base}/api/sessions/${typedRef.id}/delete`,{headers:{Authorization:`Bearer ${typedRef.token}`},data:{confirmed:true}});
 assert.equal(errors.length,0,errors.join('\n'));
 console.log('PASS browser capture (synthetic stream), active/paused reload recovery, capture/debrief, confirmed map, unseen learner intervention and correction, sandbox save, skill download, multi-session tab library, capability removal, mocked visual coach success/failure/evidence replay/privacy.');
 }finally{await browser.close();await worker.close();}

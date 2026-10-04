@@ -7,3 +7,10 @@ it('allows ungated local development but requires a gate for public or malformed
  expect(requiresDemoAccess('http://127.0.0.1:5173',undefined,'https://decision-echo.workers.dev')).toBe(true);
  expect(requiresDemoAccess('http://127.0.0.1:5173',undefined,'http://127.0.0.1:8787')).toBe(false);
 });
+
+it('opens jury access only with the explicit public deployment setting',()=>{
+ const origin='https://decision-echo.example';
+ expect(requiresDemoAccess(origin,'configured',origin,'public')).toBe(false);
+ expect(requiresDemoAccess(origin,undefined,origin,'public')).toBe(false);
+ for(const mode of [undefined,'','PUBLIC','false','gated'])expect(requiresDemoAccess(origin,'configured',origin,mode)).toBe(true);
+});

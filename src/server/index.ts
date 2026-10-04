@@ -18,8 +18,8 @@ app.use('/api/*',async(c,next)=>{
 app.onError((error,c)=>{if(error instanceof ApiError){if(error.retryAfter)c.header('Retry-After',error.retryAfter);return c.json({error:error.message},error.status as 400)}if(error instanceof z.ZodError)return c.json({error:'Invalid request or provider schema'},422);return c.json({error:'Internal server error'},500)});
 app.get('/api/config',c=>c.json(capabilities(c.env,new URL(c.req.url).origin)));
 app.post('/api/sessions',async c=>{
- // Fail closed outside local development: new capabilities permit paid provider calls.
- if(requiresDemoAccess(c.env.APP_ORIGIN,c.env.DEMO_ACCESS_CODE,new URL(c.req.url).origin)){
+ // Gate public sessions unless this deployment explicitly enables public demo access.
+ if(requiresDemoAccess(c.env.APP_ORIGIN,c.env.DEMO_ACCESS_CODE,new URL(c.req.url).origin,c.env.DEMO_ACCESS_MODE)){
   if(!c.env.DEMO_ACCESS_CODE)throw new ApiError(503,'Configure a demo access code before accepting public sessions');
   if(!constantEqual(c.req.header('X-Demo-Access')??'',c.env.DEMO_ACCESS_CODE))throw new ApiError(401,'Demo access code required');
  }
