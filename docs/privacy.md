@@ -26,15 +26,15 @@ You choose the screen, window or tab to share and grant microphone access. Befor
 
 We process information necessary to provide the service you request on the basis of Article 6(1)(b) GDPR. Where processing relies on a separate consent, Article 6(1)(a) GDPR applies and that consent may be withdrawn for the future. Only share information you are authorized to use. For confidential company information or personal data, check your organization's policy and obtain any required internal approval before starting. Use fictional task data for the hackathon demo; real voices, account identifiers and technical logs may still be personal data.
 
-**Off record:** You can stop screen and voice sharing at any time. Off record pauses screen and audio capture and outbound session processing, rejects queued or stale captures and requires an explicit action to resume. Stopping sharing does not automatically delete information already processed.
+**Off record:** You can stop screen and voice sharing at any time. Off record stops new screen and microphone capture and automatic screen observation, rejects queued or stale captures and requires an explicit action to resume. It does not delete information already processed or prevent processing you explicitly request afterwards, such as compiling a Work Map, checking a plan or saving it. It cannot recall information already received by an external provider.
 
-**Automated masking with Presidio:** We use Presidio to detect personal data in screen text and mask the corresponding image areas before sending screenshots to OpenAI for screen understanding. We also remove or replace detected personal data in transcripts before subsequent, separate language-model requests. This protection does not mean that all session data stays on your device. Automated detection can miss personal data and does not reliably identify all confidential business information. It supplements organizational approval and Off record.
+**Limited text redaction; no screenshot masking:** Decision Echo applies custom pattern-based redaction to selected text fields, including submitted questions and answers, to replace detected email addresses, telephone numbers, IBANs and payment-card numbers. Detection is limited and can miss personal data. Other text and conversation context may remain unredacted. The current build does not use Presidio, perform OCR-based personal-data detection or mask screenshot pixels. Shared screenshots can therefore contain readable personal or confidential information when uploaded to Cloudflare and sent to the configured screen-understanding provider. Do not share information you are not authorized to disclose.
 
-**Screenshot review and deletion:** Experts can select and delete one or several captured screenshots from a session. Deletion removes the selected images and their managed evidence references from Decision Echo; affected Work Maps may require review and confirmation again. Screenshot deletion does not automatically delete audio or transcripts. Contact us if you also want these categories removed.
+**Review and deletion:** You can review captured screen evidence. The current build supports deleting an entire session through “Permanently delete current session” when capture is stopped and the app permits deletion. This removes the session's managed evidence, screenshot assets, answers and Work Map from the application's active session storage. Deleting individual screenshots is not currently available. “Forget this tab's sessions” only removes browser-held access and does not delete server data. Contact us if you cannot access a session or need help with deletion.
 
-Deletion cannot undo disclosure that has already occurred. Information already received by external providers is subject to the applicable service arrangements and retention rules. The retention period below describes session data managed by Decision Echo, rather than a promise that every provider copy disappears at the same time.
+Deletion cannot undo disclosure that has already occurred, erase downloaded exports or automatically delete separate provider records, logs or backups. Information already received by external providers is subject to their applicable service arrangements and retention rules.
 
-**Session retention:** Session data is deleted 30 days after the session ends unless you explicitly save it. Content you explicitly save, including saved sessions, Work Maps and associated evidence, is retained until you delete it or request its deletion. Saving selected content does not extend retention of other, unsaved session data. Legal retention obligations or information necessary to establish, exercise or defend legal claims may require limited longer retention; such information is restricted to that purpose.
+**Session retention:** The current build does not automatically delete sessions after 30 days or distinguish saved and unsaved data for expiry. Session data, including screenshots and submitted answers, remains in application storage until the session is deleted through the app or removed by the operator. Ending capture, closing a tab or losing its access token does not delete server data. No maximum automatic retention period is currently implemented. Contact us to request deletion or information about the handling of your session. Provider logs, backups and exported copies have separate retention arrangements.
 
 ## 3. SERVER LOGS AND HOSTING
 
@@ -48,11 +48,11 @@ Provider information: [Cloudflare Privacy Policy](https://www.cloudflare.com/pri
 
 If you contact us, we process your contact details and message to respond. The legal basis is Article 6(1)(b) GDPR for contractual enquiries and Article 6(1)(f) GDPR for other requests, based on our legitimate interest in answering them. We retain correspondence until the enquiry and relevant follow-up are complete, or longer where required by legal obligations or the handling of claims.
 
-A tutoring session is not automatically a public demonstration. Sharing an identifiable demonstration with hackathon judges or publishing it is a separate purpose and requires the appropriate information and authorization. The 30-day session rule does not automatically remove copies exported by a participant or submitted to an event organizer. Their further use and retention depend on the respective recipient and purpose.
+A tutoring session is not automatically a public demonstration. Sharing an identifiable demonstration with hackathon judges or publishing it is a separate purpose and requires the appropriate information and authorization. Deleting a Decision Echo session does not automatically remove copies exported by a participant or submitted to an event organizer. Their further use and retention depend on the respective recipient and purpose.
 
 ## 5. COOKIES AND LOCAL STORAGE
 
-Cookies or browser storage used for session state, authentication, security and user preferences support the requested service. You can manage stored website data in your browser; removing or blocking necessary storage may prevent some functions from working.
+Decision Echo does not set application cookies or use localStorage or IndexedDB in the web app. It uses sessionStorage for session identifiers, access tokens and a tab-local catalog that restores access to sessions and skills after a reload. Clearing that storage removes browser access, not the underlying server session. Removing or blocking necessary storage can prevent recovery and other functions. External services and hosting infrastructure may have their own storage practices.
 
 Optional analytics or marketing technologies require separate information and, where legally required, your consent before activation. The Before you share acknowledgement is not a cookie or marketing consent. External services you open separately have their own cookie and privacy information.
 
@@ -62,29 +62,33 @@ Optional analytics or marketing technologies require separate information and, w
 
 We use ElevenLabs for the voice interviewer and tutor, speech recognition and voice output. ElevenLabs receives your microphone audio and the conversation context needed for these functions, which can include transcripts, questions, expert explanations and relevant Work Map content.
 
-**Limits of transcript masking:** Presidio does not redact the original audio already sent to ElevenLabs or undo earlier audio or transcript processing by its voice-agent services. Do not speak information you are not authorized to share. Stop sharing or use Off record before discussing sensitive information.
+**Limits of text redaction:** Original microphone audio is sent to ElevenLabs without personal-data masking. Redaction applied to selected submitted text fields does not undo earlier audio or transcript processing by the voice-agent service, and not all conversation context is redacted. Do not speak information you are not authorized to share. Stop sharing or use Off record before discussing sensitive information.
 
 Provider information: [ElevenLabs Privacy Policy](https://elevenlabs.io/privacy-policy).
 
 ### OPENAI
 
-We use OpenAI for screen understanding and language-model processing. Depending on the function, OpenAI receives masked screenshots, visual events, redacted text, expert explanations, rules, Work Map context and learner responses to interpret the workflow, identify missing information and support tutoring. Automated masking may miss personal data, so these inputs may still contain personal information.
+We use OpenAI to compile Work Maps and provide visual coaching for learner practice. It receives relevant expert answers, rules, evidence references, Work Map context, planning information and learner responses. Visual coaching can also send shared screenshots to OpenAI. Where selected as the observation provider, OpenAI also interprets expert-session screenshots. Images are not masked; text redaction is limited to the selected fields described above. Requests set the API's response-storage option to false; this does not guarantee zero provider retention or remove separate provider logs.
 
 Provider information: [OpenAI Privacy Policy](https://openai.com/policies/privacy-policy/).
 
-### PRESIDIO
+### GOOGLE CLOUD / VERTEX AI
 
-Presidio is an open-source processing component used for personal-data detection and masking. Using the software does not by itself transmit your session content to the Presidio project maintainers. Processing by this component occurs before the downstream screen-understanding and separate language-model requests described above.
+The hosted demo currently uses Gemini through Google Cloud Vertex AI for expert-session screen observation. Google receives shared screenshots and an instruction to interpret visible work and suggest a screen-specific question. Task information visible in those screenshots is part of that transfer. Screenshots are not masked and may contain personal or confidential information. This processing is separate from OpenAI Work Map compilation and learner visual coaching.
+
+Provider information: [Google Cloud Privacy Notice (service data)](https://cloud.google.com/terms/cloud-privacy-notice) and [Google Cloud Data Processing Addendum (customer data)](https://cloud.google.com/terms/data-processing-addendum). The applicable account agreements and configuration determine the handling of customer content; the service-data notice alone does not describe all processing of uploaded screenshots.
 
 ### NOTION
 
-When you use Notion as the workflow tool, the information you enter there is processed under your Notion workspace's arrangements. A connected Decision Echo workflow uses the authorized task and planning information, such as task names, assignees, time windows, deadlines and confirmation status, to support planning and review. Only connect or share workspace information you are authorized to use.
+The hosted hackathon demo uses a self-contained Notion-style planner with fictional data. Its edits remain a local draft until an explicitly approved sandbox save; it does not write to a Notion workspace.
+
+If a separately configured live Notion integration is used, the information you enter there is processed under your Notion workspace's arrangements. A connected Decision Echo workflow uses the authorized task and planning information, such as task names, assignees, time windows, deadlines and confirmation status, to support planning and review. Only connect or share workspace information you are authorized to use.
 
 Notion automatically saves edits, including drafts. Decision Echo's Save plan control checks and confirms a binding plan; it does not prevent Notion's earlier draft autosave. Deleting data from Decision Echo does not automatically delete the original entry in Notion or revoke access granted through your Notion workspace.
 
 ### PROVIDER RETENTION AND INTERNATIONAL PROCESSING
 
-Cloudflare, OpenAI and ElevenLabs operate international services. Processing may take place outside the European Economic Area, including in the United States. Provider retention can differ from Decision Echo's 30-day session rule and depends on the service and account configuration. We do not promise zero provider retention or that all information is processed exclusively within the EEA.
+Cloudflare, Google Cloud, OpenAI and ElevenLabs operate international services. Processing may take place outside the European Economic Area, including in the United States. Provider retention is separate from deletion in Decision Echo and depends on the service and account configuration. We do not promise zero provider retention or that all information is processed exclusively within the EEA.
 
 Transfers requiring safeguards must use an applicable adequacy decision or appropriate safeguards under the GDPR, such as Standard Contractual Clauses. Contact [hello@silestis.com](mailto:hello@silestis.com) for information about the safeguards applicable to your processing and how to obtain a copy where available. The linked provider policies explain their general processing; they do not replace this notice about Decision Echo.
 
