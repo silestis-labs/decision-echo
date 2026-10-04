@@ -4,6 +4,7 @@ The supervised weekly-planning demo is deployed and verified with Gemini observa
 
 ## Checks that passed
 
+- Final screenshot review corrected the fullscreen session rail’s primary button contrast with a scoped CSS rule; independent cascade review and the full isolated browser regression passed again.
 - TypeScript,120unit tests across20files, production build and GitHubCI. Independent source review fixed an IBAN text-recognition suffix defect and checked its synthetic regressions.
 - Isolated API and browser Capture/Map/Teach tests, reload recovery, evidence links,390px layout, explicit save authority, privacy epochs/lease, skill export and deletion. Chrome extension runtime tests passed within their documented coverage.
 - Actual rendered planner edit Jonas→Lea produced activity evidence in35ms; Gemini recognized the changed visible assignee in803ms. A neutral typed probe received a grounded ElevenLabs reply in986ms. This synthetic test used a muted fake microphone, not speech recognition. Earlier25second transport timeouts remain in [planner measurements](live-planner-measurements-2026-10-04.json).

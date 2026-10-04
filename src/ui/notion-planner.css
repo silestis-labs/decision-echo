@@ -23,6 +23,7 @@
 .np-session-rail .session-controls__body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:20px 24px}
 .np-session-rail .session-controls__actions button{font-size:14px;padding:10px 12px;white-space:nowrap}
 .np-session-rail .session-controls__primary{background:#203857;color:#fff}
+.np-session-rail .primary{color:#fff}
 .np-session-rail .session-controls__pause{color:#9b352d}
 /* New background validation cards also stay outside keyboard focused mode. */
 body:has(.np-expanded) .workspace main>:not(:has(.np-expanded)):not(.np-expanded){visibility:hidden}
