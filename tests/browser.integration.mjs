@@ -69,7 +69,7 @@ await expect(page.getByRole('region',{name:'Session controls',exact:true})).toBe
 await expect(page.locator('.np-expanded .np-sidebar')).toBeHidden();
 await expect(page.getByRole('contentinfo',{name:'Privacy information'}).getByRole('link',{name:'Privacy Notice'})).toBeVisible();
 const railBox=await page.getByRole('region',{name:'Session controls',exact:true}).boundingBox();
-assert(railBox&&railBox.y===0&&railBox.height===966&&railBox.x+railBox.width===1440,'Desktop session dock must span the right edge above the privacy footer');
+assert(railBox&&railBox.y===0&&railBox.height===1000&&railBox.x+railBox.width===1440,'Desktop session dock must span the full right edge without a footer strip');
 await expect(page.getByRole('button',{name:'Start session',exact:true})).toBeVisible();
 await expect(page.locator('.np-session-rail').getByRole('status',{name:'Voice activity',exact:true})).toContainText('Voice paused');
 await page.screenshot({path:'/private/tmp/decision-echo-voice-ui.png'});
