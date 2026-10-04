@@ -7,15 +7,15 @@ let page,sessionID,token;
 try{
  const context=await browser.newContext({permissions:['microphone'],viewport:{width:1440,height:1100}});page=await context.newPage();let pageErrors=0;page.on('pageerror',()=>pageErrors++);
  await page.addInitScript(()=>{navigator.mediaDevices.getDisplayMedia=async()=>{const canvas=document.createElement('canvas');canvas.width=800;canvas.height=450;const c=canvas.getContext('2d');c.fillStyle='#eee';c.fillRect(0,0,800,450);c.fillStyle='#123';c.font='22px sans-serif';c.fillText('Synthetic live voice integration fixture',20,40);return canvas.captureStream(2);};});
- await page.goto('http://127.0.0.1:5173');await page.getByRole('button',{name:'Start sandbox session →',exact:true}).click();await expect(page.getByRole('button',{name:'Share screen',exact:true})).toBeVisible();
+ await page.goto('http://127.0.0.1:5173');await page.getByRole('button',{name:'Start sandbox session →',exact:true}).click();await page.getByText('Recording settings',{exact:true}).click();await expect(page.getByRole('button',{name:'Share screen',exact:true})).toBeVisible();
  ({sessionID,token}=await page.evaluate(()=>{const ref=JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0];return {sessionID:ref.id,token:ref.token};}));
- await page.getByRole('checkbox',{name:'Synthetic simulation — mute microphone and send typed test replies',exact:true}).check();
- await page.getByRole('button',{name:'Share screen',exact:true}).click();await page.getByRole('button',{name:'Screen moment',exact:false}).first().waitFor({timeout:15000});
- await page.getByRole('button',{name:'Connect ElevenLabs voice',exact:true}).click();await expect(page.getByRole('button',{name:'Voice connected',exact:true})).toBeVisible({timeout:35000});
+ await page.getByText('Demo testing tools',{exact:true}).click();await page.getByRole('checkbox',{name:'Synthetic simulation — mute microphone and send typed test replies',exact:true}).check();
+ await page.getByRole('button',{name:'Start session',exact:true}).click();await page.getByRole('button',{name:'Screen moment',exact:false}).first().waitFor({timeout:15000});
+ await expect(page.getByRole('button',{name:'Voice connected',exact:true})).toBeVisible({timeout:35000});
  await page.getByRole('textbox',{name:'Synthetic reply',exact:true}).fill('This is a synthetic test. Jonas must do the presentation because the client explicitly requested Jonas only. Please acknowledge that requirement in one short sentence.');
  await page.getByRole('button',{name:'Send synthetic reply to ElevenLabs',exact:true}).click();
  await expect.poll(()=>page.locator('.transcript p').filter({has:page.locator('b').filter({hasText:/^ai$/})}).allTextContents().then(lines=>lines.join(' ')),{timeout:35000}).toMatch(/Jonas/);
- await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();await expect(page.getByRole('status')).toContainText('Off the record');
+ await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();await expect(page.locator('.banner[role="status"]')).toContainText('Off the record');
  ({sessionID,token}=await page.evaluate(()=>{const ref=JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0];return {sessionID:ref.id,token:ref.token};}));
  // Seed an explicitly synthetic confirmed map, isolated from a human expert claim.
  await page.evaluate(async()=>{const ref=JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0];const call=async(suffix,body)=>{const r=await fetch(`/api/sessions/${ref.id}${suffix}`,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${ref.token}`},body:body===undefined?undefined:JSON.stringify(body)});if(!r.ok)throw Error('Synthetic fixture preparation failed');return r.json();};let s=await call('');const frame=s.evidence.find(e=>e.kind==='frame').id;for(let i=0;i<6;i++)s=await call('/answers',{id:crypto.randomUUID(),stage:i<3?'capture':'debrief',question:`Synthetic live voice fixture question ${i}`,answer:'[Synthetic test narration] Client only restrictions bind the assignee. Never double-book the complete plan.',evidenceIds:[frame],ruleKinds:['customer_only','no_overlap'],guardrail:i===2});s=await call('/compile',{});await call('/confirm',{version:s.map.version});});
@@ -27,19 +27,18 @@ try{
  await page.getByRole('button',{name:'Close task details',exact:true}).click();
  await page.getByLabel('Finalize Client Presentation assignee',{exact:true}).selectOption('Lea');
  await page.getByRole('button',{name:'Check with the learned rules',exact:true}).click();await expect(page.getByRole('heading',{name:'Pause before saving',exact:true})).toBeVisible();
- await page.getByRole('checkbox',{name:'Synthetic simulation — mute microphone and send typed test replies',exact:true}).check();await page.getByRole('button',{name:'Share learner screen',exact:true}).click();
- await page.getByRole('button',{name:'Connect voice tutor',exact:true}).click();
+ await page.getByText('Demo testing tools',{exact:true}).click();await page.getByRole('checkbox',{name:'Synthetic simulation — mute microphone and send typed test replies',exact:true}).check();await page.getByText('Recording settings',{exact:true}).click();await page.getByRole('button',{name:'Start session',exact:true}).click();
  await expect(page.getByRole('button',{name:'Send synthetic reply to ElevenLabs',exact:true})).toBeDisabled(); // Empty replies remain disabled.
  await page.getByRole('textbox',{name:'Synthetic reply',exact:true}).fill('Synthetic learner test: explain the currently blocked assignment using the validation context already supplied. Which person is required?');
  await expect(page.getByRole('button',{name:'Send synthetic reply to ElevenLabs',exact:true})).toBeEnabled({timeout:35000});await page.getByRole('button',{name:'Send synthetic reply to ElevenLabs',exact:true}).click();
  await expect.poll(()=>page.locator('.transcript p').filter({has:page.locator('b').filter({hasText:/^ai$/})}).allTextContents().then(lines=>lines.join(' ')),{timeout:35000}).toMatch(/Jonas/);
  await expect(page.getByRole('button',{name:'I approve · save sandbox plan',exact:true})).toBeDisabled();
- await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();await expect(page.getByRole('status')).toContainText('Off the record');
+ await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();await expect(page.locator('.banner[role="status"]')).toContainText('Off the record');
  await page.getByLabel('Finalize Client Presentation assignee',{exact:true}).selectOption('Jonas');
  await page.getByRole('button',{name:'Check with the learned rules',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Proposal passed the confirmed rules',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'I approve · save sandbox plan',exact:true}).click();
- await expect(page.getByRole('status')).toHaveText('Sandbox proposal saved. No Notion workspace was changed.');
+ await expect(page.locator('.banner[role="status"]')).toHaveText('Sandbox proposal saved. No Notion workspace was changed.');
  await page.getByRole('button',{name:'04 Skill library',exact:true}).click();
  const downloadPromise=page.waitForEvent('download');
  await page.getByRole('button',{name:'Download reviewed SKILL.md ↓',exact:true}).click();

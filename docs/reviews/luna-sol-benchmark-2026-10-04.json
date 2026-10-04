@@ -1,0 +1,313 @@
+{
+  "checkedAt": "2026-10-04T08:34:30.670Z",
+  "status": "comparison_complete_with_low_detail_quality_failure",
+  "method": "Nine direct Responses requests: three Sol production-default reasoning/low-detail, three Luna low-reasoning/low-detail, then three authorized Luna low-reasoning/high-detail. Production observe instruction is unchanged. Original pair calls alternated order; high-detail extension recaptured the same synthetic planner states and is not interleaved.",
+  "samples": [
+    {
+      "round": 1,
+      "configuration": "sol",
+      "model": "gpt-6.1-sol",
+      "reasoning": "production_default",
+      "fixture": "baseline",
+      "status": "passed",
+      "ms": 8431,
+      "httpStatus": 200,
+      "question": "Why is Lea assigned to Analyze Cohort Data?",
+      "ruleKinds": [
+        "skill_match"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "oneQuestion": true,
+        "nonempty": true,
+        "visibleTopic": true,
+        "noInventedNamedPerson": true,
+        "noUnsupportedSafetyAvailabilityClaim": true,
+        "safeSyntheticText": true
+      }
+    },
+    {
+      "round": 1,
+      "configuration": "luna",
+      "model": "gpt-6-luna",
+      "reasoning": "low",
+      "fixture": "baseline",
+      "status": "passed",
+      "ms": 6349,
+      "httpStatus": 200,
+      "question": "Why is “Update Market Analysis” still unassigned?",
+      "ruleKinds": [],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "oneQuestion": true,
+        "nonempty": true,
+        "visibleTopic": true,
+        "noInventedNamedPerson": true,
+        "noUnsupportedSafetyAvailabilityClaim": true,
+        "safeSyntheticText": true
+      }
+    },
+    {
+      "round": 2,
+      "configuration": "luna",
+      "model": "gpt-6-luna",
+      "reasoning": "low",
+      "fixture": "changed",
+      "status": "passed",
+      "ms": 3224,
+      "httpStatus": 200,
+      "question": "Why is “Update Market Analysis” left unassigned?",
+      "ruleKinds": [],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "oneQuestion": true,
+        "nonempty": true,
+        "visibleTopic": true,
+        "noInventedNamedPerson": true,
+        "noUnsupportedSafetyAvailabilityClaim": true,
+        "safeSyntheticText": true
+      }
+    },
+    {
+      "round": 2,
+      "configuration": "sol",
+      "model": "gpt-6.1-sol",
+      "reasoning": "production_default",
+      "fixture": "changed",
+      "status": "passed",
+      "ms": 10860,
+      "httpStatus": 200,
+      "question": "Why is Lea assigned to Finalize Client Presentation on Wednesday afternoon when her listed Wednesday availability is 09:00–11:00?",
+      "ruleKinds": [
+        "availability"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "oneQuestion": true,
+        "nonempty": true,
+        "visibleTopic": true,
+        "noInventedNamedPerson": true,
+        "noUnsupportedSafetyAvailabilityClaim": true,
+        "safeSyntheticText": true
+      }
+    },
+    {
+      "round": 3,
+      "configuration": "sol",
+      "model": "gpt-6.1-sol",
+      "reasoning": "production_default",
+      "fixture": "changed",
+      "status": "passed",
+      "ms": 7635,
+      "httpStatus": 200,
+      "question": "Why is Lea assigned to Finalize Client Presentation?",
+      "ruleKinds": [],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "oneQuestion": true,
+        "nonempty": true,
+        "visibleTopic": true,
+        "noInventedNamedPerson": true,
+        "noUnsupportedSafetyAvailabilityClaim": true,
+        "safeSyntheticText": true
+      }
+    },
+    {
+      "round": 3,
+      "configuration": "luna",
+      "model": "gpt-6-luna",
+      "reasoning": "low",
+      "fixture": "changed",
+      "status": "quality_check_failed",
+      "ms": 2060,
+      "httpStatus": 200,
+      "question": "Why is the AltaMarket Analysis task unassigned?",
+      "ruleKinds": [
+        "availability",
+        "skill_match"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "oneQuestion": true,
+        "nonempty": true,
+        "visibleTopic": true,
+        "noInventedNamedPerson": true,
+        "noUnsupportedSafetyAvailabilityClaim": true,
+        "safeSyntheticText": true,
+        "noInventedVisibleLabel": false
+      }
+    },
+    {
+      "round": 1,
+      "configuration": "luna_high",
+      "model": "gpt-6-luna",
+      "reasoning": "low",
+      "fixture": "baseline",
+      "imageDetail": "high",
+      "status": "passed",
+      "ms": 5924,
+      "httpStatus": 200,
+      "question": "Why is Update Market Analysis still unassigned?",
+      "ruleKinds": [],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "oneQuestion": true,
+        "nonempty": true,
+        "visibleTopic": true,
+        "noInventedNamedPerson": true,
+        "noInventedVisibleLabel": true,
+        "noUnsupportedSafetyAvailabilityClaim": true,
+        "safeSyntheticText": true
+      }
+    },
+    {
+      "round": 2,
+      "configuration": "luna_high",
+      "model": "gpt-6-luna",
+      "reasoning": "low",
+      "fixture": "changed",
+      "imageDetail": "high",
+      "status": "passed",
+      "ms": 5358,
+      "httpStatus": 200,
+      "question": "Why is Finalize Client Presentation assigned to Lea when it says Jonas only?",
+      "ruleKinds": [],
+      "guardrail": true,
+      "checks": {
+        "strictSchema": true,
+        "oneQuestion": true,
+        "nonempty": true,
+        "visibleTopic": true,
+        "noInventedNamedPerson": true,
+        "noInventedVisibleLabel": true,
+        "noUnsupportedSafetyAvailabilityClaim": true,
+        "safeSyntheticText": true
+      }
+    },
+    {
+      "round": 3,
+      "configuration": "luna_high",
+      "model": "gpt-6-luna",
+      "reasoning": "low",
+      "fixture": "changed",
+      "imageDetail": "high",
+      "status": "passed",
+      "ms": 5154,
+      "httpStatus": 200,
+      "question": "Why is Finalize Client Presentation assigned to Lea when it says Jonas only?",
+      "ruleKinds": [
+        "customer_only"
+      ],
+      "guardrail": true,
+      "checks": {
+        "strictSchema": true,
+        "oneQuestion": true,
+        "nonempty": true,
+        "visibleTopic": true,
+        "noInventedNamedPerson": true,
+        "noInventedVisibleLabel": true,
+        "noUnsupportedSafetyAvailabilityClaim": true,
+        "safeSyntheticText": true
+      }
+    }
+  ],
+  "summaries": [
+    {
+      "configuration": "sol",
+      "attempts": 3,
+      "passed": 3,
+      "medianMs": 8431,
+      "minMs": 7635,
+      "maxMs": 10860
+    },
+    {
+      "configuration": "luna",
+      "attempts": 3,
+      "passed": 2,
+      "medianMs": 3224,
+      "minMs": 2060,
+      "maxMs": 6349
+    },
+    {
+      "configuration": "luna_high",
+      "attempts": 3,
+      "passed": 3,
+      "medianMs": 5358,
+      "minMs": 5154,
+      "maxMs": 5924
+    }
+  ],
+  "checks": {
+    "noBrowserRuntimeErrors": true,
+    "allProviderAndGroundingChecksPass": false,
+    "syntheticSessionDeleted": true,
+    "lunaHighAllThreeProviderAndGroundingChecksPass": true,
+    "extensionScreenshotHashesMatchOriginals": true,
+    "selectedConfigurationPassed": true
+  },
+  "limitations": [
+    "Nine calls over two fictional planner states are a latency and basic grounding sample, not a universal quality benchmark.",
+    "Grounding checks compare names and task words against visible rendered text and reject explicit unsupported safety/availability assertions; independent human review remains necessary.",
+    "Direct Responses requests measure provider latency; they do not measure automatic capture, app queue latency or voice ASR.",
+    "High-detail extension recaptured identical screenshot bytes (both SHA256 hashes match originals), but extension requests were not interleaved with Sol. Nine calls do not establish universal accuracy."
+  ],
+  "baseline": {
+    "jpegBytes": 62891,
+    "sha256": "3e585fd6d014d75ac515c61c0ed311f571e100e5a093f227b50a7bc7ee1f47f6",
+    "presentationAssignee": "Jonas"
+  },
+  "changed": {
+    "jpegBytes": 62848,
+    "sha256": "71006667c216d4a37de424213ec2fecbe7070e0594f394d51541efc996ccaed1",
+    "presentationAssignee": "Lea"
+  },
+  "priorCheckedAt": "2026-10-04T08:32:47.276Z",
+  "manualReview": {
+    "reviewedOriginalSix": true,
+    "lunaLowDetailIssue": "Changed repeat says AltaMarket Analysis, which is not a visible task. Actual title is Update Market Analysis. Automatic initial broad topic check missed the invented label; strengthened named visible label checking.",
+    "changedDecisionSelection": "Both Sol changed questions address Lea on Finalize Client Presentation. Luna low detail instead asks a different visible unassigned task; generic production prompt allows this choice, so selection alone is not a failure.",
+    "solAvailability": "The Wednesday 09:00–11:00 Lea window is an explicit displayed Team capacity source fact, not invented availability.",
+    "recommendation": "Luna low reasoning plus high image detail is the fastest configuration that passed all three observed label/grounding checks in this sample. Recommend observation-only routing with Sol retained for compile/coaching, fallback on malformed/provider responses, and continued case coverage. This does not establish universal accuracy.",
+    "highDetailReviewed": true,
+    "highDetailResult": "All three high-detail questions reference exact visible task/person labels. Both changed-case questions explicitly identify Lea assigned despite Jonas only. Baseline asks the real unassigned Update Market Analysis task. No invented availability or claim that the plan is safe."
+  },
+  "instructionSha256": "5efdc63b0aabc61f74b25db43697ca09a432861e3b46da867b180bbd493c3069",
+  "baselineHighDetail": {
+    "jpegBytes": 62891,
+    "sha256": "3e585fd6d014d75ac515c61c0ed311f571e100e5a093f227b50a7bc7ee1f47f6",
+    "presentationAssignee": "Jonas"
+  },
+  "changedHighDetail": {
+    "jpegBytes": 62848,
+    "sha256": "71006667c216d4a37de424213ec2fecbe7070e0594f394d51541efc996ccaed1",
+    "presentationAssignee": "Lea"
+  },
+  "speedComparison": {
+    "solMedianMs": 8431,
+    "lunaHighMedianMs": 5358,
+    "lunaHighReductionPercent": 36.4,
+    "lunaLowMedianMs": 3224,
+    "lunaLowQualityFailureCount": 1
+  },
+  "selectedConfiguration": {
+    "model": "gpt-6-luna",
+    "reasoningEffort": "low",
+    "imageDetail": "high",
+    "scope": "observation only",
+    "passedSamples": 3,
+    "attempts": 3
+  },
+  "rejectedConfiguration": {
+    "model": "gpt-6-luna",
+    "reasoningEffort": "low",
+    "imageDetail": "low",
+    "reason": "Invented visible task label in changed repeat; all provider HTTP requests succeeded but one grounding check failed."
+  }
+}

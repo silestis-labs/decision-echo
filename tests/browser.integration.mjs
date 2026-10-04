@@ -12,7 +12,7 @@ await page.addInitScript(()=>{navigator.mediaDevices.getDisplayMedia=async()=>{c
 await page.goto('http://127.0.0.1:5173');
 await page.getByRole('button',{name:'Start sandbox session →',exact:true}).click();
 // Planner navigation and draft edits must not persist schedule changes.
-await expect(page.getByRole('heading',{name:'LIVE · Task Planning',exact:true})).toBeVisible();
+await expect(page.getByRole('heading',{name:'Weekly planning',exact:true})).toBeVisible();
 await expect(page.getByText('Atlas Data Correction',{exact:true})).toHaveCount(0);
 const draftRef=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0]);
 const originalDraft=await (await page.request.get(`${worker.base}/api/sessions/${draftRef.id}`,{headers:{Authorization:`Bearer ${draftRef.token}`}})).json();
@@ -31,7 +31,32 @@ await expect(page.getByRole('button',{name:'Close task details',exact:true})).to
 await page.keyboard.press('Escape');
 await expect(page.getByRole('button',{name:'Finalize Client Presentation',exact:true})).toBeFocused();
 await page.getByRole('button',{name:'▦ Table',exact:true}).click();
+// Full-view focus containment and emergency stop, including a narrow detail panel.
+await page.getByRole('button',{name:'Focus planner',exact:true}).click();
+await expect(page.getByRole('region',{name:'Session controls',exact:true})).toBeVisible();
+await expect(page.locator('.np-expanded .np-sidebar')).toBeHidden();
+const railBox=await page.getByRole('region',{name:'Session controls',exact:true}).boundingBox();
+assert(railBox&&railBox.y===0&&railBox.height===1000&&railBox.x+railBox.width===1440,'Desktop session dock must span the full right edge');
+await expect(page.getByRole('button',{name:'Start session',exact:true})).toBeVisible();
+await expect(page.locator('.np-session-rail').getByRole('status',{name:'Voice activity',exact:true})).toContainText('Voice paused');
+await page.screenshot({path:'/private/tmp/decision-echo-voice-ui.png'});
+await page.keyboard.press('Shift+Tab');
+assert(await page.evaluate(()=>!!document.activeElement.closest('.np-expanded')),'Fullscreen keyboard focus must stay inside the planner');
+await page.setViewportSize({width:800,height:900});
+const exitBox=await page.getByRole('button',{name:'Exit full view',exact:true}).boundingBox();
+assert(exitBox&&exitBox.x+exitBox.width<=800,'Full-view exit must fit a medium-width viewport');
+await expect(page.locator('.np-expanded .np-sidebar')).toBeHidden();
+await page.setViewportSize({width:390,height:844});
+await page.getByRole('button',{name:'Finalize Client Presentation',exact:true}).click();
+await expect(page.getByRole('button',{name:'◼ Off the record',exact:true})).toBeVisible();
+await expect(page.getByRole('button',{name:'◼ Off the record',exact:true})).toBeEnabled();
+await page.keyboard.press('Escape');
+await expect(page.getByRole('button',{name:'Close task details',exact:true})).toHaveCount(0);
+await page.keyboard.press('Escape');
+await expect(page.getByRole('button',{name:'Focus planner',exact:true})).toBeFocused();
+await page.setViewportSize({width:1440,height:1000});
 
+await page.getByText('Demo testing tools',{exact:true}).click();
 const simulation=page.getByRole('checkbox',{name:'Synthetic simulation — mute microphone and send typed test replies',exact:true});
 await expect(simulation).not.toBeChecked();
 await simulation.check();
@@ -43,12 +68,16 @@ await page.getByRole('button',{name:'02 Work Map',exact:true}).click();
 await expect(page.getByRole('heading',{name:'Your Work Map is not ready yet'})).toBeVisible();
 await expect(page.getByRole('textbox',{name:'New debrief question',exact:true})).toHaveCount(0);
 await page.getByRole('button',{name:'Return to Capture',exact:true}).click();
+await page.getByText('Recording settings',{exact:true}).click();
 // A picker response arriving after Off the record must stop its tracks without activating recording.
 await page.evaluate(()=>{window.__deferCapture=true;});
-await page.getByRole('button',{name:'Share screen',exact:true}).click();
+await page.getByRole('button',{name:'Focus planner',exact:true}).click();
+await page.getByRole('button',{name:'Start session',exact:true}).click();
 await page.waitForFunction(()=>typeof window.__releaseCapture==='function');
 await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();
 await page.evaluate(()=>{window.__deferCapture=false;window.__releaseCapture();});
+await expect(page.getByRole('button',{name:'Start session',exact:true})).toBeEnabled();
+await page.getByRole('button',{name:'Exit full view',exact:true}).click();
 await expect(page.getByRole('button',{name:'Share screen',exact:true})).toBeEnabled();
 await expect(page.getByText('Screen sharing stopped',{exact:true})).toBeVisible();
 // Delay capture activation to exercise Off the record while the server start is in flight.
@@ -71,7 +100,8 @@ await page.getByRole('checkbox',{name:'Show capture preview',exact:true}).check(
 await expect(page.getByAltText('Latest captured surface preview')).toBeVisible();
 await expect.poll(async()=>new Set(await page.getByAltText('Captured screen thumbnail').evaluateAll(imgs=>imgs.map(img=>img.src))).size,{timeout:12000}).toBeGreaterThan(1);
 await page.reload();
-await expect(page.getByRole('status')).toContainText('Session recovered');
+await expect(page.locator('.banner[role="status"]')).toContainText('Session recovered');
+await page.getByText('Recording settings',{exact:true}).click();
 await expect(page.getByRole('button',{name:'Share screen',exact:true})).toBeEnabled();
 const pausedEvidenceCount=await page.getByRole('button',{name:'Screen moment',exact:false}).count();
 await page.waitForTimeout(2500);
@@ -82,16 +112,20 @@ await page.getByRole('textbox',{name:'Expert’s own answer',exact:true}).fill('
 await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();
 await expect(page.getByRole('textbox',{name:'Expert’s own answer',exact:true})).toHaveValue('Unsaved expert answer retained on pause.');
 await page.reload();
-await expect(page.getByRole('status')).toContainText('Session recovered');
+await expect(page.locator('.banner[role="status"]')).toContainText('Session recovered');
+await page.getByText('Recording settings',{exact:true}).click();
 await expect(page.getByRole('button',{name:'Share screen',exact:true})).toBeEnabled();
 await expect(page.getByRole('textbox',{name:'Expert’s own answer',exact:true})).toHaveValue('');
 await page.getByRole('button',{name:'Share screen',exact:true}).click();
 for(let i=0;i<3;i++){
+if(i===0){await page.getByRole('button',{name:'Focus planner',exact:true}).click();await page.getByText('Review answer',{exact:true}).click();}
 await page.getByRole('textbox',{name:'Screen-specific question',exact:true}).fill(`Synthetic capture question ${i}`);
 await page.getByRole('textbox',{name:'Expert’s own answer',exact:true}).fill(`Synthetic expert test answer ${i}: protect the entire weekly schedule and avoid double bookings.`);
+if(!await page.getByRole('checkbox',{name:'No overlapping work',exact:true}).isVisible())await page.getByText('Confirm what this answer teaches',{exact:true}).filter({visible:true}).click();
 await page.getByRole('checkbox',{name:'No overlapping work',exact:true}).check();
 if(i===2)await page.getByRole('checkbox',{name:'This answer establishes a stop, limit or escalation guardrail'}).check();
 await page.getByRole('button',{name:'Save evidenced answer',exact:true}).click();
+if(i===0&&await page.getByRole('button',{name:'Exit full view',exact:true}).isVisible()){await expect(page.getByText('1 of 3 answers saved',{exact:true}).filter({visible:true})).toBeVisible();await page.getByRole('button',{name:'Exit full view',exact:true}).click();}
 await expect(page.getByText(`${i+1}/3 answers`,{exact:true})).toBeVisible();
 await expect(page.getByRole('textbox',{name:'Expert’s own answer',exact:true})).toHaveValue('');
 }
@@ -99,6 +133,7 @@ await page.getByRole('button',{name:'Finish capture → debrief',exact:true}).cl
 for(let i=0;i<3;i++){
 await page.getByRole('textbox',{name:'New debrief question',exact:true}).fill(`Synthetic debrief question ${i}`);
 await page.getByRole('textbox',{name:'Expert’s own answer',exact:true}).fill(`Synthetic debrief answer ${i}: include displaced work in the plan check.`);
+if(!await page.getByRole('checkbox',{name:'No overlapping work',exact:true}).isVisible())await page.getByText('Confirm what this answer teaches',{exact:true}).filter({visible:true}).click();
 await page.getByRole('checkbox',{name:'No overlapping work',exact:true}).check();
 await page.getByRole('button',{name:'Save evidenced answer',exact:true}).click();
 await expect(page.getByText(`${i+1}/3 answers`,{exact:true})).toBeVisible();
@@ -123,10 +158,15 @@ await page.getByRole('heading',{name:'Pause before saving',exact:true}).scrollIn
 await page.screenshot({path:'/private/tmp/decision-echo-intervention.png'});
 await page.getByLabel('Analyze Cohort Data start',{exact:true}).fill('2026-10-09T08:00');
 await page.getByLabel('Analyze Cohort Data end',{exact:true}).fill('2026-10-09T12:00');
+await page.getByRole('button',{name:'Focus planner',exact:true}).click();
+await page.getByText('Review plan',{exact:true}).click();
 await page.getByRole('button',{name:'Check with the learned rules',exact:true}).click();
-await expect(page.getByRole('heading',{name:'Proposal passed the confirmed rules',exact:true})).toBeVisible();
+await expect(page.getByRole('region',{name:'Session controls',exact:true}).getByText('Plan checked · ready to save',{exact:true})).toBeVisible();
 await page.getByRole('button',{name:'I approve · save sandbox plan',exact:true}).click();
-await expect(page.getByRole('status')).toHaveText('Sandbox proposal saved. No Notion workspace was changed.');
+await expect(page.getByRole('region',{name:'Session controls',exact:true}).getByText('Plan saved',{exact:true})).toBeVisible();
+await expect(page.getByRole('button',{name:'I approve · save sandbox plan',exact:true})).toBeDisabled();
+await page.getByRole('button',{name:'Exit full view',exact:true}).click();
+await expect(page.locator('.banner[role="status"]')).toHaveText('Sandbox proposal saved. No Notion workspace was changed.');
 await page.screenshot({path:'/private/tmp/decision-echo-browser-review.png',fullPage:false});
 // Mocked vision-provider UI contract test: this does not prove real model screen understanding.
 await expect(page.getByText('Visual coaching is not configured.',{exact:false})).toBeVisible();
@@ -138,6 +178,7 @@ const mockCoach=frameId=>({frameId,at:new Date().toISOString(),mapVersion:coachS
 await page.route('**/api/sessions/*/coach',route=>route.fulfill({json:mockCoach(route.request().postDataJSON().frameId)}));
 await page.reload();
 await page.getByRole('button',{name:'03 Teach',exact:true}).click();
+await page.getByText('Recording settings',{exact:true}).click();
 await page.getByRole('button',{name:'Share learner screen',exact:true}).click();
 await expect(page.getByText('Synthetic mocked vision observation',{exact:true})).toBeVisible({timeout:15000});
 await expect(page.getByRole('button',{name:'I’m at a natural pause · discuss this frame',exact:true})).toBeDisabled();
@@ -152,7 +193,7 @@ let releaseCoach;const coachBarrier=new Promise(resolve=>{releaseCoach=resolve;}
 await page.route('**/api/sessions/*/coach',async route=>{const frameId=route.request().postDataJSON().frameId;coachSeen();await coachBarrier;await route.fulfill({json:{...mockCoach(frameId),summary:'Late synthetic observation that must be discarded'}}).catch(()=>{});});
 await pendingCoach;
 await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();
-await expect(page.getByRole('status')).toHaveText('Off the record. Screen and microphone stopped. Resume requires fresh permission.');
+await expect(page.locator('.banner[role="status"]')).toHaveText('Off the record. Screen and microphone stopped. Resume requires fresh permission.');
 releaseCoach();
 await expect(page.getByText('Late synthetic observation that must be discarded',{exact:true})).toHaveCount(0);
 await expect(page.getByText('Synthetic mocked vision observation',{exact:true})).toHaveCount(0);
@@ -178,7 +219,7 @@ await expect(page.getByRole('button',{name:/Screen moment.*Synthetic external co
 const heartbeat=await page.waitForResponse(response=>response.url().endsWith('/heartbeat')&&response.status()===200,{timeout:18000});
 assert((await heartbeat.json()).expiresAt>Date.now());
 await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();
-await expect(page.getByRole('status')).toHaveText('Off the record. Screen and microphone stopped. Resume requires fresh permission.');
+await expect(page.locator('.banner[role="status"]')).toHaveText('Off the record. Screen and microphone stopped. Resume requires fresh permission.');
 const stale=await page.request.post(`${worker.base}/api/sessions/${ref.id}/evidence`,{headers:companionHeaders,data:{epoch:companionSession.epoch,kind:'activity',text:'Stale companion event'}});
 assert.equal(stale.status(),409);
 await page.getByRole('button',{name:'04 Skill library',exact:true}).click();
@@ -187,7 +228,7 @@ const priorHeaders={Authorization:`Bearer ${priorRef.token}`,'Content-Type':'app
 const priorState=await (await page.request.get(`${worker.base}/api/sessions/${priorRef.id}`,{headers:priorHeaders})).json();
 await page.request.post(`${worker.base}/api/sessions/${priorRef.id}/recording`,{headers:priorHeaders,data:{recording:true,epoch:priorState.epoch}});
 await page.getByRole('button',{name:'Open saved skill',exact:true}).click();
-await expect(page.getByRole('status')).toHaveText('Opened saved session. Sensors are off.');
+await expect(page.locator('.banner[role="status"]')).toHaveText('Opened saved session. Sensors are off.');
 const reopened=await (await page.request.get(`${worker.base}/api/sessions/${priorRef.id}`,{headers:priorHeaders})).json();
 assert.equal(reopened.recording,false,'reopening must pause another collector’s active session');
 await expect(page.getByRole('button',{name:'Download reviewed SKILL.md ↓'})).toBeEnabled();
@@ -197,7 +238,7 @@ await page.getByRole('button',{name:'Permanently delete current session',exact:t
 await expect(page.getByRole('button',{name:'Download reviewed SKILL.md ↓'})).toBeEnabled();
 page.once('dialog',dialog=>dialog.accept());
 await page.getByRole('button',{name:'Permanently delete current session',exact:true}).click();
-await expect(page.getByRole('status')).toContainText('Session and server evidence erased');
+await expect(page.locator('.banner[role="status"]')).toContainText('Session and server evidence erased');
 const deletedResponse=await page.request.get(`${worker.base}/api/sessions/${deleteRef.id}`,{headers:{Authorization:`Bearer ${deleteRef.token}`}});
 assert.equal(deletedResponse.status(),404);
 assert.equal(await page.evaluate(id=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1')).some(r=>r.id===id),deleteRef.id),false);

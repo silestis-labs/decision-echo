@@ -1,16 +1,16 @@
 # Planning workspace
 
-The Decision Echo Planning Sandbox independently recreates the planning layout inspected in the team's Notion demo workspace: gray workspace navigation, breadcrumb, green page icon, team capacity table, task database, deadline calendar, production/review timeline and task sidepeek. It uses Decision Echo branding and existing synthetic session data; no Notion source code or assets are included.
+The Decision Echo Planning Sandbox independently recreates the planning layout inspected in the team's Notion demo workspace: gray workspace navigation, breadcrumb, team capacity table, task database, deadline calendar, production/review timeline and task sidepeek. It uses Decision Echo branding and existing synthetic session data; no Notion source code or assets are included.
 
 ## Use
 
-Start a sandbox session. In Capture, the three expert tasks are editable local practice drafts. Use Table, Calendar or Timeline; select a task title to open its properties. Focus planner opens the workspace at full viewport size. Exit full view to return to capture or coaching controls. Search and calendar/week navigation change the view only.
+Start a sandbox session. In Capture, the three expert tasks are editable local practice drafts. Use Table, Calendar or Timeline; select a task title to open its properties. Focus planner opens the workspace at full viewport size. The full-view session panel provides Start session, Off the record, answer review and learner checks/save. Recording settings and synthetic testing tools stay collapsed in the regular workspace. Escape exits full view; keyboard focus stays inside it. Search and calendar/week navigation change the view only.
 
 After the expert confirms the Work Map, Teach opens the held-out case. Edit assignment, decision, work times, review reservation and follow-up fields. Check with the learned rules, correct any blocking finding, then explicitly approve saving. Every proposal edit invalidates the previous validation. The server validates again before committing. Completed commits make the planner read-only and display Saved / Confirmed. Capture practice edits have no save action.
 
 ## Persistence and time
 
-Planner edits stay in React state and disappear on reload until committed. They do not autosave to Notion or update the server's schedule. Validation stores check/progress metadata, not a committed proposal. Calendar and capacity labels use Europe/Berlin; native date inputs use the browser's local time, stated in the workspace. Task constraints are read-only source facts because the server intentionally does not accept them as proposal edits.
+Planner edits stay in React state and disappear on reload until committed. They do not autosave to Notion or update the server's schedule. Validation stores check/progress metadata, not a committed proposal. Calendar and capacity labels use Europe/Berlin; native date inputs use the browser's local time, stated in the workspace footer. Task constraints are read-only source facts because the server intentionally does not accept them as proposal edits.
 
 ## Current scope
 
@@ -39,3 +39,7 @@ Untouched legacy sandbox sessions receive the current template when loaded. Sess
 Explicit required assignees, supplied availability, dependency readiness, effort and deadlines are source constraints, enforced even when no matching expert operator was learned. Findings label these checks `Source constraint` and contain no invented expert quote. When an evidenced operator provides the same check, its expert explanation is retained without a duplicate finding. Overlap and other judgment policies remain evidence-dependent.
 
 The reference template labels a 09:00–13:00 cohort task “Morning only”. To preserve that reference example, this template interprets the label as **start before noon in Europe/Berlin**. It does not impose a whole-slot noon cutoff or claim that this interpretation generalizes to other customers. A stricter morning-only policy needs an explicit template and capacity change.
+
+## Full-view session controls — 2026-10-04
+
+Start session combines screen selection and configured voice connection. Off the record stays enabled during setup. Capture uses Review answer to confirm the question, expert quote, frame and rule meanings before saving. Teach uses Review plan for findings, checks and explicit approved save. Advanced recording and synthetic simulation controls are collapsed outside full view. In full view, the left planning navigation is hidden to reserve space for the workspace. The session sidebar is docked across the full right edge, with a fixed action header and independently scrolling content. Narrow screens use a bottom dock; task cells retain their own space. See [full-view review](../reviews/fullscreen-ui-review-2026-10-04.md) for verification and limits.

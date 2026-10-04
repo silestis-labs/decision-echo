@@ -26,11 +26,13 @@ Without an OpenAI key, the sandbox compiles actual entered answers into selected
 
 ## Connect live providers
 
-Copy `.dev.vars.example` to ignored `.dev.vars` and configure credentials locally. Browser login alone does not connect the application. For the current self-contained demo, keep `MODE=sandbox`: that selects synthetic planning data while real ElevenLabs and OpenAI providers remain active when configured. Notion credentials are optional and are only needed for the separate Notion adapter mode.
+Copy `.dev.vars.example` to ignored `.dev.vars` and configure credentials locally. Browser login alone does not connect the application. For the current self-contained demo, keep `MODE=sandbox`: that selects synthetic planning data while real ElevenLabs voice, Gemini screenshot observation and OpenAI map/learner coaching remain active when configured. Gemini uses Google Cloud EU endpoints; current local OAuth tokens expire and require refresh. Notion credentials are optional and are only needed for the separate Notion adapter mode.
 
-Configure `ELEVENLABS_API_KEY`, separate expert/tutor agent IDs and `OPENAI_API_KEY`; use an account-accessible `OPENAI_MODEL` (the verified local configuration uses `gpt-6.1-sol`). Configure the selected v4 Turbo voice on both ElevenLabs agents. See [server setup](docs/server-setup.md). Keep keys server-side and out of Git.
+Configure `ELEVENLABS_API_KEY`, separate expert/tutor agent IDs and `OPENAI_API_KEY`; use account-accessible models. Defaults use `gpt-6.1-sol` for Work Map compilation and learner visual coaching, and Vertex `gemini-3.5-flash-lite` with minimal thinking for short screenshot observations. The optional OpenAI observation route uses `gpt-6-luna` with low reasoning/high image detail. See [server setup](docs/server-setup.md) for workload overrides and [local comparison](docs/reviews/luna-sol-comparison-2026-10-04.md) for measured limits. Configure the selected v4 Turbo voice on both ElevenLabs agents. Keep keys server-side and out of Git.
 
 ## Verified and pending
+
+The [Gemini activation review](docs/reviews/gemini-observation-activation-2026-10-04.md) records the current provider routing and a real Gemini/ElevenLabs synthetic planner integration test.
 
 The [live web validation report](docs/reviews/live-web-validation-2026-10-04.md) records an actual Chrome screen-share run with real OpenAI observation/compilation, both ElevenLabs agents, six explicitly synthetic typed answers, confirmed map, a blocked learner mistake, correction, explicit local save and downloaded skill. A real microphone transcript was not tested in that run. Model output remains advisory until reviewed; supported scheduling operators, rather than arbitrary prose, drive controlled validation.
 

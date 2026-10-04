@@ -31,7 +31,7 @@ export type VisualCoach = {frameId:string;at:string;mapVersion:number;summary:st
 export type Availability = { person:z.infer<typeof Person>; skill:string[]; start:string; end:string };
 export type LearningProgress = { checks:number; blockedChecks:number; encounteredRuleIds:string[]; resolvedRuleIds:string[] };
 export type Session = { progress?:LearningProgress; templateVersion?:number; id:string; epoch:number; recording:boolean; phase:'capture'|'map'|'teach'; mode:'sandbox'|'live'; evidence:Evidence[]; answers:Answer[]; map:WorkMap|null; tasks:Task[]; availability:Availability[]; validation:Validation|null; commitStatus:'idle'|'writing'|'complete'|'partial'|'unknown'; revision:number };
-export type Capabilities = { elevenLabs:boolean; openAI:boolean; notion:boolean; mode:'sandbox'|'live'; model:string; voiceModel:string; accessCodeRequired:boolean };
+export type Capabilities = { elevenLabs:boolean; openAI:boolean; vision?:boolean; observationProvider?:'openai'|'gemini'; notion:boolean; mode:'sandbox'|'live'; model:string; observationModel?:string; observationReasoning?:string; observationImageDetail?:string; voiceModel:string; accessCodeRequired:boolean };
 
 // Bearer session capability is returned once at creation and retained in tab-scoped sessionStorage by the browser; server stores only a digest.
 // Every session request carries Authorization: Bearer <token>; never put it in a URL.

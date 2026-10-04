@@ -4,6 +4,6 @@
   "assets":{"directory":"./dist","binding":"ASSETS","not_found_handling":"single-page-application","run_worker_first":["/api/*"]},
   "durable_objects":{"bindings":[{"name":"SESSIONS","class_name":"EchoSession"}]},
   "migrations":[{"tag":"v1","new_sqlite_classes":["EchoSession"]}],
-  "vars":{"MODE":"sandbox","OPENAI_MODEL":"gpt-6.1-sol","ELEVENLABS_VOICE_MODEL":"v4-turbo","APP_ORIGIN":"http://127.0.0.1:5173"},
+  "vars":{"MODE":"sandbox","OBSERVATION_PROVIDER":"gemini","VERTEX_MODEL":"gemini-3.5-flash-lite","GOOGLE_CLOUD_LOCATION":"eu","OPENAI_MODEL":"gpt-6.1-sol","OPENAI_OBSERVATION_MODEL":"gpt-6-luna","OPENAI_OBSERVATION_REASONING":"low","OPENAI_OBSERVATION_IMAGE_DETAIL":"high","ELEVENLABS_VOICE_MODEL":"v4-turbo","APP_ORIGIN":"http://127.0.0.1:5173"},
   "observability":{"enabled":true}
 }

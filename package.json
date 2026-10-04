@@ -20,7 +20,13 @@
     "test:lease": "node tests/lease.integration.mjs",
     "test:integration": "npm run test:api && npm run test:browser && npm run test:extension && npm run test:extension:runtime",
     "test:vision": "node tests/vision.integration.mjs",
-    "deploy": "npm run build && wrangler deploy --var APP_ORIGIN:https://decision-echo.litchis-sixty-1m.workers.dev"
+    "test:live-learning": "node tests/live-learning.integration.mjs",
+    "test:live-planner": "node tests/live-planner.integration.mjs",
+    "test:model-latency": "node tests/model-latency.integration.mjs",
+    "deploy": "npm run build && wrangler deploy --var APP_ORIGIN:https://decision-echo.litchis-sixty-1m.workers.dev",
+    "test:voice-ui": "node tests/voice-presence.integration.mjs",
+    "test:vertex-adapter": "node --test tests/vertex-adapter.test.mjs",
+    "test:gemini-luna": "node tests/gemini-luna.integration.mjs"
   },
   "dependencies": {
     "@elevenlabs/react": "1.16.0",

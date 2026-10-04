@@ -1,5 +1,9 @@
 # Copy to .dev.vars; never paste credentials in chat or commit them.
 OPENAI_API_KEY=
+# Optional workload overrides (otherwise use OPENAI_MODEL from Wrangler):
+# OPENAI_OBSERVATION_MODEL=gpt-6-luna
+# OPENAI_OBSERVATION_REASONING=low
+# OPENAI_OBSERVATION_IMAGE_DETAIL=high
 ELEVENLABS_API_KEY=
 ELEVENLABS_EXPERT_AGENT_ID=
 ELEVENLABS_TUTOR_AGENT_ID=
@@ -11,3 +15,14 @@ NOTION_DATA_SOURCE_ID=
 NOTION_AVAILABILITY_JSON=[]
 # Optional exact Chrome extension origin; no wildcard.
 EXTENSION_ORIGIN=
+
+# Observation provider (Gemini is the configured default; openai retains the legacy path).
+OBSERVATION_PROVIDER=gemini
+# VERTEX_AUTH_MODE=oauth
+# GOOGLE_CLOUD_PROJECT=your-project-id
+# GOOGLE_CLOUD_LOCATION=eu
+# VERTEX_MODEL=gemini-3.5-flash-lite
+# GOOGLE_CLOUD_API_KEY=  # Service-account-bound Google Cloud key, never an AI Studio key.
+# GOOGLE_CLOUD_ACCESS_TOKEN=  # Short-lived OAuth token for local tests; refresh when expired.
+# Alternative: VERTEX_AUTH_MODE=api_key with a permitted service-account-bound key.
+# Express mode: VERTEX_AUTH_MODE=express_key with its express key; project/location omitted.

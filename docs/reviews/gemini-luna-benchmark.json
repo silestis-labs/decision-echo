@@ -1,0 +1,646 @@
+{
+  "checkedAt": "2026-10-04T09:35:04.608Z",
+  "status": "pilot_incomplete_or_quality_failure",
+  "method": "Identical JPEG and production prompt, alternating provider order. Luna low/high versus Vertex Gemini minimal/default image processing. Complete JSON latency includes body transfer and parsing.",
+  "instructionSha256": "5efdc63b0aabc61f74b25db43697ca09a432861e3b46da867b180bbd493c3069",
+  "samples": [
+    {
+      "provider": "luna",
+      "round": 1,
+      "fixture": 0,
+      "model": "gpt-6-luna",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 3725,
+      "ms": 3726,
+      "question": "Why is Update Market Analysis unassigned when Lea has Data Analysis listed as a skill?",
+      "ruleKinds": [
+        "skill_match"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "gemini",
+      "round": 1,
+      "fixture": 0,
+      "model": "gemini-3.5-flash-lite",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 1794,
+      "ms": 1794,
+      "question": "Why is Finalize Client Presentation assigned to Jonas?",
+      "ruleKinds": [
+        "skill_match",
+        "availability"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "luna",
+      "round": 2,
+      "fixture": 1,
+      "model": "gpt-6-luna",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 4340,
+      "ms": 4340,
+      "question": "Why is Finalize Client Presentation assigned to Lea when the task says \u201cJonas only\u201d?",
+      "ruleKinds": [
+        "customer_only"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "gemini",
+      "round": 2,
+      "fixture": 1,
+      "model": "gemini-3.5-flash-lite",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 1203,
+      "ms": 1203,
+      "question": "Why is Lea assigned to Finalize Client Presentation when it requires Jonas only?",
+      "ruleKinds": [
+        "customer_only",
+        "skill_match"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "gemini",
+      "round": 3,
+      "fixture": 0,
+      "model": "gemini-3.5-flash-lite",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 1028,
+      "ms": 1028,
+      "question": "Why is Finalize Client Presentation assigned to Jonas?",
+      "ruleKinds": [
+        "skill_match",
+        "customer_only",
+        "availability"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "luna",
+      "round": 3,
+      "fixture": 0,
+      "model": "gpt-6-luna",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 5431,
+      "ms": 5431,
+      "question": "Why is Finalize Client Presentation assigned to Jonas?",
+      "ruleKinds": [
+        "availability",
+        "skill_match"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "gemini",
+      "round": 4,
+      "fixture": 1,
+      "model": "gemini-3.5-flash-lite",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 746,
+      "ms": 746,
+      "question": "Why is Lea assigned to Finalize Client Presentation when the task specifies Jonas only?",
+      "ruleKinds": [
+        "customer_only",
+        "skill_match"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "luna",
+      "round": 4,
+      "fixture": 1,
+      "model": "gpt-6-luna",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 3674,
+      "ms": 3674,
+      "question": "Why is Finalize Client Presentation assigned to Lea when it says Jonas only?",
+      "ruleKinds": [
+        "customer_only"
+      ],
+      "guardrail": true,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "luna",
+      "round": 5,
+      "fixture": 0,
+      "model": "gpt-6-luna",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 4644,
+      "ms": 4644,
+      "question": "Why is Update Market Analysis still unassigned?",
+      "ruleKinds": [
+        "availability"
+      ],
+      "guardrail": true,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "gemini",
+      "round": 5,
+      "fixture": 0,
+      "model": "gemini-3.5-flash-lite",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 687,
+      "ms": 688,
+      "question": "Why is Finalize Client Presentation assigned to Jonas?",
+      "ruleKinds": [
+        "skill_match",
+        "availability"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "luna",
+      "round": 6,
+      "fixture": 1,
+      "model": "gpt-6-luna",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 3428,
+      "ms": 3428,
+      "question": "Why is Finalize Client Presentation assigned to Lea when it says Jonas only?",
+      "ruleKinds": [
+        "customer_only",
+        "availability"
+      ],
+      "guardrail": true,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "gemini",
+      "round": 6,
+      "fixture": 1,
+      "model": "gemini-3.5-flash-lite",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 589,
+      "ms": 589,
+      "question": "Why is Lea assigned to Finalize Client Presentation when the constraint says Jonas only?",
+      "ruleKinds": [
+        "customer_only",
+        "skill_match"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "gemini",
+      "round": 7,
+      "fixture": 0,
+      "model": "gemini-3.5-flash-lite",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 617,
+      "ms": 617,
+      "question": "Why is Jonas assigned to Finalize Client Presentation?",
+      "ruleKinds": [
+        "skill_match",
+        "availability"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "luna",
+      "round": 7,
+      "fixture": 0,
+      "model": "gpt-6-luna",
+      "status": "quality_check_failed",
+      "httpStatus": 200,
+      "responseMs": 2593,
+      "ms": 2594,
+      "question": "Why is Analyze Cohort Data scheduled until 13:00 when Lea is available only until 11:00 on Wednesday?",
+      "ruleKinds": [
+        "availability"
+      ],
+      "guardrail": true,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": false
+      }
+    },
+    {
+      "provider": "gemini",
+      "round": 8,
+      "fixture": 1,
+      "model": "gemini-3.5-flash-lite",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 646,
+      "ms": 646,
+      "question": "Why is Lea assigned to Finalize Client Presentation when the task specifies Jonas only?",
+      "ruleKinds": [
+        "customer_only",
+        "skill_match",
+        "availability"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "luna",
+      "round": 8,
+      "fixture": 1,
+      "model": "gpt-6-luna",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 2824,
+      "ms": 2824,
+      "question": "Why is Analyze Cohort Data scheduled with Lea from 09:00 to 13:00 when her Wednesday availability ends at 11:00?",
+      "ruleKinds": [
+        "availability"
+      ],
+      "guardrail": true,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "luna",
+      "round": 9,
+      "fixture": 0,
+      "model": "gpt-6-luna",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 4540,
+      "ms": 4540,
+      "question": "Why is Update Market Analysis still unassigned?",
+      "ruleKinds": [
+        "skill_match"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "gemini",
+      "round": 9,
+      "fixture": 0,
+      "model": "gemini-3.5-flash-lite",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 832,
+      "ms": 833,
+      "question": "Why is Jonas assigned to Finalize Client Presentation?",
+      "ruleKinds": [
+        "customer_only",
+        "skill_match",
+        "availability"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "luna",
+      "round": 10,
+      "fixture": 1,
+      "model": "gpt-6-luna",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 3544,
+      "ms": 3544,
+      "question": "Why is the Northstar presentation assigned to Lea when it says Jonas only?",
+      "ruleKinds": [
+        "customer_only",
+        "skill_match"
+      ],
+      "guardrail": true,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "gemini",
+      "round": 10,
+      "fixture": 1,
+      "model": "gemini-3.5-flash-lite",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 711,
+      "ms": 711,
+      "question": "Why is Lea assigned to Finalize Client Presentation when the task specifies Jonas only?",
+      "ruleKinds": [
+        "customer_only",
+        "skill_match"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "gemini",
+      "round": 11,
+      "fixture": 0,
+      "model": "gemini-3.5-flash-lite",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 946,
+      "ms": 947,
+      "question": "Why is Finalize Client Presentation assigned to Jonas?",
+      "ruleKinds": [
+        "skill_match",
+        "customer_only",
+        "availability"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "luna",
+      "round": 11,
+      "fixture": 0,
+      "model": "gpt-6-luna",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 3782,
+      "ms": 3782,
+      "question": "Why is Update Market Analysis still unassigned?",
+      "ruleKinds": [
+        "skill_match",
+        "availability"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "gemini",
+      "round": 12,
+      "fixture": 1,
+      "model": "gemini-3.5-flash-lite",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 849,
+      "ms": 849,
+      "question": "Why is Lea assigned to Finalize Client Presentation when the task says Jonas only?",
+      "ruleKinds": [
+        "customer_only",
+        "skill_match",
+        "availability"
+      ],
+      "guardrail": false,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    },
+    {
+      "provider": "luna",
+      "round": 12,
+      "fixture": 1,
+      "model": "gpt-6-luna",
+      "status": "passed",
+      "httpStatus": 200,
+      "responseMs": 4379,
+      "ms": 4379,
+      "question": "Why is Finalize Client Presentation assigned to Lea on Wednesday from 14:00\u201317:00, outside her listed availability?",
+      "ruleKinds": [
+        "availability"
+      ],
+      "guardrail": true,
+      "checks": {
+        "strictSchema": true,
+        "singleQuestion": true,
+        "nonempty": true,
+        "safeSyntheticText": true,
+        "noInventedKnownPerson": true,
+        "noUnsupportedSafetyClaim": true
+      }
+    }
+  ],
+  "fixtures": [
+    {
+      "assignee": "Jonas",
+      "sha256": "3e585fd6d014d75ac515c61c0ed311f571e100e5a093f227b50a7bc7ee1f47f6",
+      "jpegBytes": 62891
+    },
+    {
+      "assignee": "Lea",
+      "sha256": "71006667c216d4a37de424213ec2fecbe7070e0594f394d51541efc996ccaed1",
+      "jpegBytes": 62848
+    }
+  ],
+  "summaries": [
+    {
+      "provider": "luna",
+      "attempts": 12,
+      "passed": 11,
+      "completedResponses": 12,
+      "medianMs": 3753.5,
+      "p95Ms": null,
+      "rangeMs": [
+        2593,
+        5431
+      ]
+    },
+    {
+      "provider": "gemini",
+      "attempts": 12,
+      "passed": 12,
+      "completedResponses": 12,
+      "medianMs": 789,
+      "p95Ms": null,
+      "rangeMs": [
+        589,
+        1794
+      ]
+    }
+  ],
+  "checks": {
+    "syntheticSessionDeleted": true
+  },
+  "limitations": [
+    "Pilot uses two task-assignment screenshot states; repeated samples are not diverse cases.",
+    "Automated grounding filters are incomplete; manual output review required before selecting a provider.",
+    "No microphone, screen permission picker, automatic app queue or speech-onset latency measured.",
+    "No production routing change is made by this benchmark."
+  ],
+  "manualReview": {
+    "basis": "Compared all returned questions with fixture assignment state and src/domain/planning.ts seeded dates. Cohort is Thursday 8 Oct 09:00\u201313:00, not Wednesday.",
+    "gemini": {
+      "groundedQuestions": 12,
+      "reviewed": 12,
+      "changedAssignmentRecognized": 6,
+      "changedAssignmentCases": 6
+    },
+    "luna": {
+      "groundedQuestions": 10,
+      "reviewed": 12,
+      "incorrectCohortDayRounds": [
+        7,
+        8
+      ]
+    },
+    "note": "Automatic filter pass counts are not factual accuracy scores. The safety-expression regex also flags availability questions; manual review is reported separately."
+  }
+}
