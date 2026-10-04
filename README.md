@@ -15,8 +15,6 @@ The hosted demo requires the shared access code supplied separately by the team.
 **Actual application screenshots with synthetic rehearsal inputs.** These images come from a fresh isolated Capture/Map/Teach run: authored answers, a confirmed map, a correction and an explicit sandbox save. They demonstrate the rendered product and controlled policy path; this run made no voice, vision or other provider calls. [Screenshot provenance and checks](docs/reviews/jury-product-evidence-2026-10-04.md).
 
 
-<details>
-<summary>Inspect the captured answer, rule evidence and corrected result</summary>
 
 ### Capture: review the answer and its screen source
 
@@ -30,7 +28,7 @@ The hosted demo requires the shared access code supplied separately by the team.
 
 ![The corrected saved sandbox plan passes the confirmed rules](docs/images/corrected-plan.png)
 
-</details>
+
 
 For actual provider and separate human microphone evidence, see the [hosted release report](docs/reviews/release-verification-2026-10-04.md). The [walkthrough](docs/demo-walkthrough.md) gives the complete rehearsal sequence.
 
@@ -207,7 +205,7 @@ npm run dev
 
 Open [http://127.0.0.1:5173](http://127.0.0.1:5173). The local API runs on port **8787**. Select **Start sandbox session**, capture three expert answers including a guardrail, complete three new debrief answers, review and confirm the map, then open the learner case. Follow the [walkthrough](docs/demo-walkthrough.md) for exact rehearsal inputs.
 
-Without provider credentials, deterministic compilation binds the answers you actually enter to expert-selected supported rule types. It does not invent answers or simulate a live model. Real voice, observation and model compilation can be used with synthetic planning data independently of Notion.
+Without provider credentials, deterministic compilation binds the answers you actually enter to expert-selected supported rule types. It does not invent answers or simulate a live model. Real voice, observation and model compilation can be used with synthetic planning data.
 
 ### Connect providers
 
