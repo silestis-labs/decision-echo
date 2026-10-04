@@ -1,7 +1,8 @@
 import { z } from 'zod';
 export class ApiError extends Error { constructor(public status:number, message:string,public retryAfter?:string){super(message)} }
-/** Public installations must explicitly gate creation of provider-backed sessions. */
-export function requiresDemoAccess(origin:string,code?:string,requestOrigin=origin){
+/** Public installations are gated unless explicitly opened for a public demo. */
+export function requiresDemoAccess(origin:string,code?:string,requestOrigin=origin,accessMode?:string){
+ if(accessMode==='public')return false;
  if(code)return true;
  const local=(value:string)=>{try{const url=new URL(value);return ['http:','https:'].includes(url.protocol)&&['127.0.0.1','localhost','[::1]'].includes(url.hostname);}catch{return false;}};
  return !local(origin)||!local(requestOrigin);

@@ -220,7 +220,7 @@ await page.getByRole('button',{name:'I approve · save sandbox plan',exact:true}
 await expect(page.getByRole('region',{name:'Session controls',exact:true}).getByText('Plan saved',{exact:true})).toBeVisible();
 await expect(page.getByRole('button',{name:'I approve · save sandbox plan',exact:true})).toBeDisabled();
 await page.getByRole('button',{name:'Exit full view',exact:true}).click();
-await expect(page.locator('.banner[role="status"]')).toHaveText('Sandbox proposal saved. No Notion workspace was changed.');
+await expect(page.locator('.banner[role="status"]')).toHaveText('Plan saved in your Decision Echo workspace.');
 await page.screenshot({path:'/private/tmp/decision-echo-browser-review.png',fullPage:false});
 // Mocked vision-provider UI contract test: this does not prove real model screen understanding.
 await expect(page.getByText('Visual coaching is not configured.',{exact:false})).toBeVisible();

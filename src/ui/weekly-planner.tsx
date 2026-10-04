@@ -2,7 +2,7 @@ import {PrivacyFooter} from './privacy';
 import React, { useEffect, useId, useRef, useState } from 'react';
 import type { Availability, Task } from '../shared/contracts';
 import { DateField } from './date-field';
-import './notion-planner.css';
+import './weekly-planner.css';
 
 type PlannerProps = { tasks: Task[]; availability: Availability[]; onChange: (tasks: Task[]) => void; readOnly?: boolean; mode?: 'capture' | 'teach'; saved?: boolean; fullViewControls?: React.ReactNode };
 type View = 'table' | 'calendar' | 'timeline';
@@ -15,7 +15,7 @@ const calendarDate = (value: number) => { const [year, month, day] = dayKey(new 
 const berlinMidnight = (value: Date) => { const key = dayKey(value); const utc = Date.parse(`${key}T00:00:00Z`); const offset = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Berlin', timeZoneName: 'shortOffset' }).formatToParts(new Date(utc)).find(p => p.type === 'timeZoneName')?.value.match(/GMT([+-])(\d+)(?::(\d+))?/); const minutes = offset ? (Number(offset[2]) * 60 + Number(offset[3] ?? 0)) * (offset[1] === '-' ? -1 : 1) : 0; return utc - minutes * 60000; };
 
 /** A controlled draft editor. Persistence and policy checks belong to the host. */
-export function NotionPlanner({ tasks, availability, onChange, readOnly = false, mode = 'capture', saved = false, fullViewControls }: PlannerProps) {
+export function WeeklyPlanner({ tasks, availability, onChange, readOnly = false, mode = 'capture', saved = false, fullViewControls }: PlannerProps) {
   const [expanded, setExpanded] = useState(false);
   const plannerRoot = useRef<HTMLElement | null>(null);
   useEffect(() => {
