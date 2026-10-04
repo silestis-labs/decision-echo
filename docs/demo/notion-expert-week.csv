@@ -1,0 +1,4 @@
+Task,Required Skill,Effort (h),Deadline,Priority,Customer Preference,Dependency Status,Dependency Available At,Flags,Proposed Assignee,Start,End,Review Owner,Review Start,Review End,Follow-up Owner,Follow-up Checkpoint,Decision
+Analyze Cohort Data,Data Analysis,4,"October 9, 2026 5:00 PM",P2,No preference,Ready,,Focus Work,Lea,"October 8, 2026 9:00 AM","October 8, 2026 1:00 PM",None,,,,,Schedule
+Finalize Client Presentation,Client Communication,3,"October 8, 2026 12:00 PM",P1,Jonas only,Ready,,Review Required,Jonas,"October 7, 2026 2:00 PM","October 7, 2026 5:00 PM",Mira,"October 8, 2026 9:00 AM","October 8, 2026 10:00 AM",,,Schedule
+Update Market Analysis,Data Analysis,3,"October 9, 2026 4:00 PM",P2,No preference,Blocked,,Focus Work,Unassigned,,,None,,,Jonas,"October 8, 2026 10:00 AM",Request information

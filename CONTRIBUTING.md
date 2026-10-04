@@ -1,6 +1,6 @@
 # Contributing to Decision Echo
 
-This guide applies to human developers and their coding agents. The project is currently in architecture/planning; there is no application build or installation command yet. Use real manifests and checks once implementation exists, rather than inventing a toolchain.
+This guide applies to human developers and their coding agents. The repository contains a React browser workspace, a Cloudflare Worker/Durable Object service, a Chrome extension and a native macOS capture companion. Use the checked-in manifests and the commands below.
 
 ## Access and checkout
 
@@ -47,7 +47,7 @@ For product worktrees, remember that ignored `internal/` is not populated automa
 
 Discover installed skills on your own machine. Useful gstack roles include plan-eng-review, review, qa/qa-only and context-save/context-restore. [Upstream gstack](https://github.com/garrytan/gstack). Installation is framework-specific and separate from this repository; read current upstream instructions before installing or running a skill. Missing optional skills do not justify silently installing global tooling or claiming their workflows passed.
 
-Run checks relevant to the actual change. Internal knowledge changes require `python3 scripts/wiki_lint.py` from the internal checkout. Product application checks will be documented with the implementation. Report skipped checks and missing dependencies honestly.
+Run checks relevant to the actual change. Internal knowledge changes require `python3 scripts/wiki_lint.py` from the internal checkout. Product checks are `npm run check`, followed by `npm run test:integration` with both local servers running. `npm run test:lease` verifies the actual 60-second fail-closed capture lease. For native packaging and Swift tests, follow [macOS companion](docs/macos-companion.md). Browser automation substitutes a labeled synthetic stream for the OS share picker; the extension runtime test uses a separate synthetic HTTP backend and an isolated Chromium profile. These checks do not establish provider account access or native screen-capture permission. Report skipped checks and missing dependencies honestly.
 
 ## Commit, review and handoff
 

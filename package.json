@@ -13,7 +13,13 @@
     "check": "npm run typecheck && npm test && npm run build",
     "test:api": "node tests/api.integration.mjs",
     "test:browser": "node tests/browser.integration.mjs",
-    "test:extension": "node apps/chrome-extension/panel.test.mjs"
+    "test:extension": "node apps/chrome-extension/panel.test.mjs",
+    "test:extension:worker": "TEST_WORKER=1 node apps/chrome-extension/runtime.test.mjs",
+    "test:extension:runtime": "node apps/chrome-extension/runtime.test.mjs",
+    "test:voice": "node tests/voice.integration.mjs",
+    "test:lease": "node tests/lease.integration.mjs",
+    "test:integration": "npm run test:api && npm run test:browser && npm run test:extension && npm run test:extension:runtime",
+    "test:vision": "node tests/vision.integration.mjs"
   },
   "dependencies": {
     "@elevenlabs/react": "1.16.0",

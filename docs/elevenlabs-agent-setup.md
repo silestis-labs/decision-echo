@@ -1,6 +1,6 @@
 # ElevenLabs demo configuration
 
-Log in to ElevenLabs, create one expert interviewer and one learner tutor, and copy their IDs into local `.dev.vars`. Create a scoped API key and store it there too. Browser login is not application authentication. Restart the local API after changes. This is configuration guidance; these account settings have not yet been applied or tested.
+Log in to ElevenLabs, create one expert interviewer and one learner tutor, and copy their IDs into local `.dev.vars`. Create a scoped API key and store it there too. Browser login is not application authentication. Restart the local API after changes. This is configuration guidance; the project account has published both roles and completed labeled synthetic live exchanges. A new account must still perform this setup and verify its own access.
 
 Select the user-chosen **v4 Turbo** voice model in each agent if the account exposes it. The informational `ELEVENLABS_VOICE_MODEL` app setting does not configure a remote agent. Verify the actual dashboard setting and run a spoken conversation; do not silently substitute another model. Agent LLM choice and voice model are separate settings. Current SDK uses `ConversationProvider` and server-minted signed conversation URLs.
 

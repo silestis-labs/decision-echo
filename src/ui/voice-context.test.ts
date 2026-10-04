@@ -14,4 +14,9 @@ describe('voice connection context',()=>{
   deliverVoiceContext('connected',{context:'review',debrief:true},sender);expect(sender.sendUserMessage).toHaveBeenCalledTimes(1);
   deliverVoiceContext('connected',null,sender);expect(sender.sendUserMessage).toHaveBeenCalledTimes(1);
  });
+ it('asks the tutor for a learner prediction before the first change in teach',()=>{
+  const sender={sendContextualUpdate:vi.fn(),sendUserMessage:vi.fn()};
+  deliverVoiceContext('connected',{context:'map',debrief:false,teach:true},sender);
+  expect(sender.sendUserMessage).toHaveBeenCalledTimes(1);expect(sender.sendUserMessage.mock.calls[0][0]).toContain('predict my next decision');
+ });
 });

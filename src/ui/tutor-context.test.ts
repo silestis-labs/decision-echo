@@ -1,0 +1,5 @@
+import {expect,it} from 'vitest';
+import {createSandboxSession} from '../domain/planning';
+import {voiceStartContext} from './tutor-context';
+it('keeps the held-out learner case out of interviewer context',()=>{const s=createSandboxSession('test','sandbox');const context=voiceStartContext(s,'capture',s.tasks,null);expect(context).not.toHaveProperty('learnerCase');expect(context).not.toHaveProperty('unsavedProposal');expect(JSON.stringify(context)).not.toContain('Atlas');});
+it('gives a newly connected tutor current unsaved decisions and findings',()=>{const s=createSandboxSession('test','sandbox');const proposal=s.tasks.map(t=>({...t,assignee:'Lea' as const}));const validation={allowed:false,findings:[{ruleId:'required',taskIds:['presentation'],severity:'block' as const,message:'Restore Jonas',expertQuote:'Jonas only',evidenceIds:['frame']}],mapVersion:1,checkedAt:'now'};expect(voiceStartContext(s,'teach',proposal,validation)).toMatchObject({learnerCase:s.tasks,unsavedProposal:proposal,validation});});

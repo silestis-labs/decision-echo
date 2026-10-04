@@ -4,6 +4,14 @@ import type { Rule,WorkMap } from '../shared/contracts';
 const kinds:Rule['kind'][]=['no_overlap','availability','customer_only','skill_match','dependency_ready','focus_block','review_buffer','blocked_followup'];
 const map = (buffer?:number):WorkMap=>({id:'test',version:1,status:'confirmed',teachBack:'Expert confirmed',rules:kinds.map(kind=>({id:kind,kind,title:kind,explanation:kind,evidenceIds:['e1'],expertQuote:`Expert evidence for ${kind}`,parameters:kind==='review_buffer'&&buffer!==undefined?{bufferMinutes:buffer}:{}}))});
 describe('whole-plan expert policy',()=>{
+  it('requires resolving ready urgent work in a learner case, including accountable escalation',()=>{
+    const tasks=sandboxTasks();
+    expect(validatePlan(tasks,sandboxAvailability(),map(),{requireUrgentResolution:true}).allowed).toBe(false);
+    Object.assign(tasks[3],{decision:'Escalate',followUpOwner:'Jonas',followUpCheckpoint:'2026-10-08T11:00:00+02:00'});
+    expect(validatePlan(tasks,sandboxAvailability(),map(),{requireUrgentResolution:true}).allowed).toBe(true);
+    tasks[3].followUpCheckpoint='2026-10-08T13:00:00+02:00';
+    expect(validatePlan(tasks,sandboxAvailability(),map(),{requireUrgentResolution:true}).allowed).toBe(false);
+  });
   it('catches urgent work that leaves displaced work double-booked, then accepts a complete correction',()=>{
     const tasks=sandboxTasks();
     Object.assign(tasks[3],{assignee:'Lea',start:'2026-10-08T09:00:00+02:00',end:'2026-10-08T11:00:00+02:00',decision:'Schedule'});

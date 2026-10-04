@@ -1,15 +1,15 @@
 # Decision Echo requirements and acceptance contract
 
-Status: source-derived specification and proposed acceptance checks, 2026-10-03. Application behavior is not implemented or verified. Target: complete challenge coverage and persuasive evidence; this is not a guarantee of a judge score. The supplied ElevenLabs brief has no numerical scoring weights.
+Status: source-derived specification and proposed acceptance checks, 2026-10-03. The connected local journey and capture-client foundations are implemented; runtime evidence and remaining gates are tracked in the implementation results. Target: complete challenge coverage and persuasive evidence; this is not a guarantee of a judge score. The supplied ElevenLabs brief has no numerical scoring weights.
 
-This public-safe specification paraphrases the challenge and defines our product acceptance contract. Original materials and page-by-page provenance remain in the separate private knowledge repository. “Required” denotes explicit challenge requirements; “expected” denotes behavior/technology described by the brief; “quality” denotes judging signals; “extension” denotes our full-suite product ambitions.
+This public-safe specification paraphrases the challenge and defines our product acceptance contract. Original materials and page-by-page provenance remain in the separate private knowledge repository. The Capture module prose says “Build a web app,” while the brief also invites different interfaces. The numerical Capture Required list covers questions, pauses and a guardrail. We keep the browser journey as our product requirement, without claiming a Mac companion is prohibited. “Required” denotes explicit challenge requirements; “expected” denotes behavior/technology described by the brief; “quality” denotes judging signals; “extension” denotes our full-suite product ambitions.
 
 ## Required challenge gates
 
 | ID | Requirement | Observable acceptance evidence |
 |---|---|---|
 | CORE-01 | Deliver Capture, Map and Teach as one connected journey. | An expert session produces a confirmed map that the learner subsequently uses. No manually substituted map between stages. |
-| CAP-01 | Provide a web capture application with expert screen sharing and an ElevenLabs conversation panel. | Expert selects the shared surface; the browser session supplies real observations and voice. A native companion may enrich this path. |
+| CAP-01 | Provide expert screen sharing and an ElevenLabs conversation panel. Our product implements the web interface described by Module 1. | Expert selects the shared surface; the browser session supplies real observations and voice. A native companion may enrich this path. |
 | CAP-02 | Ask at least three live questions at natural pauses, each about a visible screen moment. | Three timestamped question/answer records link to observed evidence and the choice that prompted the question. Generic questions do not count. |
 | CAP-03 | Include at least one live guardrail question. | Expert explains a limit, exception or stop/escalation condition during Capture. |
 | MAP-01 | Conduct a spoken debrief with at least three follow-up questions that were not already answered during the task. | Gap ledger identifies three distinct unresolved issues and records new answers. Repeating live questions does not satisfy this gate. |
@@ -80,6 +80,6 @@ Event slides list a public code/docs repository, live demo, demo video, technica
 
 ## Coverage reporting
 
-Use `not built`, `implemented but unverified`, `verified` or `blocked` per requirement, with an evidence link and map/build version. A connected local sandbox journey is implemented and tested; live voice/vision and Notion gate verification remain pending. See [implementation results](reviews/implementation-results.md) for evidence and limits. Documentation completion is not functionality completion. “100% required-gate coverage” means every explicit gate has verified evidence; report expected behaviors, quality signals and stretch coverage separately. No calculated percentage should be presented as an official score.
+Use `not built`, `implemented but unverified`, `verified` or `blocked` per requirement, with an evidence link and map/build version. A connected local sandbox journey is implemented and tested; real synthetic ElevenLabs expert/tutor exchanges and Chrome window capture have also been exercised; vision and Notion gate verification remain pending. See [implementation results](reviews/implementation-results.md) for evidence and limits. Documentation completion is not functionality completion. “100% required-gate coverage” means every explicit gate has verified evidence; report expected behaviors, quality signals and stretch coverage separately. No calculated percentage should be presented as an official score.
 
 See [implementation plan](implementation-plan.md), [agent bootstrap](agent-bootstrap.md) and [publication policy](publication-policy.md).

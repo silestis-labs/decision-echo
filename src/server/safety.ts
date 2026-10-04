@@ -13,7 +13,11 @@ export async function readBody(request:Request,max=1_500_000):Promise<unknown>{
 export const imageSchema=z.string().max(550_000).regex(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/);
 export async function providerFetch(url:string,init:RequestInit,fetcher:typeof fetch=fetch){
  let response:Response;try{response=await fetcher(url,{...init,signal:AbortSignal.timeout(25_000)})}catch{throw new ApiError(502,'Provider delivery uncertain; no automatic retry')}
- if(!response.ok)throw new ApiError(response.status===429?429:502,`Provider request failed (${response.status})`,response.headers.get('retry-after')||undefined);
+ if(!response.ok){
+  // Expose bounded machine identifiers only, never provider messages or echoed input.
+  let detail='';try{const data=await response.json() as {error?:{code?:unknown;param?:unknown}};const identifiers=[data.error?.code,data.error?.param].filter((v):v is string=>typeof v==='string'&&/^[a-zA-Z0-9_.\[\]-]{1,80}$/.test(v));if(identifiers.length)detail=': '+identifiers.join(', ');}catch{}
+  throw new ApiError(response.status===429?429:502,`Provider request failed (${response.status})${detail}`,response.headers.get('retry-after')||undefined);
+ }
  return response;
 }
 

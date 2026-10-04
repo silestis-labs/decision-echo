@@ -26,7 +26,7 @@ export function sandboxTasks():Task[] {
   ];
 }
 export function createSandboxSession(id:string,mode:'sandbox'|'live'):Session {
-  return {id,mode,epoch:0,recording:false,phase:'capture',evidence:[],answers:[],map:null,tasks:sandboxTasks(),availability:sandboxAvailability(),validation:null,commitStatus:'idle',revision:0};
+  return {progress:{checks:0,blockedChecks:0,encounteredRuleIds:[],resolvedRuleIds:[]},id,mode,epoch:0,recording:false,phase:'capture',evidence:[],answers:[],map:null,tasks:sandboxTasks(),availability:sandboxAvailability(),validation:null,commitStatus:'idle',revision:0};
 }
 
 const descriptions:Record<string,[string,string]> = {
@@ -55,7 +55,7 @@ export function compileMap(session:Session):WorkMap {
   return WorkMapSchema.parse({id:`map-${session.id}`,version:(session.map?.version??0)+1,status:'draft',rules,teachBack:rules.map(r=>`${r.title}: ${r.expertQuote}`).join('\n\n')});
 }
 
-export function validatePlan(tasks:Task[],availability:Availability[],map:WorkMap):Validation {
+export function validatePlan(tasks:Task[],availability:Availability[],map:WorkMap,options:{requireUrgentResolution?:boolean}={}):Validation {
   const findings:Finding[]=[];
   const add=(ruleId:string, taskIds:string[],message:string,severity:'block'|'warning'='block')=>{
     const rule=map.rules.find(r=>r.id===ruleId);
@@ -64,6 +64,13 @@ export function validatePlan(tasks:Task[],availability:Availability[],map:WorkMa
   // Structural integrity is always enforced. Domain judgments below depend on confirmed learned rules.
   if(map.status!=='confirmed') add('system',[],'The expert must confirm this Work Map before tutoring or saving.');
   if(new Set(tasks.map(t=>t.id)).size!==tasks.length) add('system',[],'Duplicate task IDs are not allowed.');
+  if(options.requireUrgentResolution){
+    for(const task of tasks){
+      if(task.priority!==0||task.dependencyStatus!=='Ready')continue;
+      if(task.decision==='Hold'||task.decision==='Request information') add('system',[task.id],'Ready urgent work must be scheduled or explicitly escalated; holding it does not complete this case.');
+      if(task.decision==='Escalate'&&(!task.followUpOwner.trim()||!Number.isFinite(time(task.followUpCheckpoint))||time(task.followUpCheckpoint)>time(task.deadline))) add('system',[task.id],'An urgent escalation needs an accountable owner and a checkpoint by the deadline.');
+    }
+  }
   const assigned=tasks.filter(t=>t.decision==='Schedule'||t.decision==='Split');
   for(const task of assigned){
     if(!Number.isFinite(time(task.start))||!Number.isFinite(time(task.end))||time(task.start)>=time(task.end)||task.assignee==='Unassigned') add('system',[task.id],'A scheduled task needs an assignee and valid start and end.');

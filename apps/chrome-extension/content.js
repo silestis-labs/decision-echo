@@ -3,7 +3,7 @@ if (!globalThis.__decisionEchoCapture) {
   let active=false;
   const send=(text)=>{if(active)chrome.runtime.sendMessage({type:'capture-activity',text}).catch(()=>{});};
   const click=(e)=>{
-    const el=e.target.closest?.('button,a,[role="button"],input,select');
+    const el=e.target.closest?.('button,a,[role="button"],input,textarea,select,[contenteditable]');
     if(!el)return;
     // Input labels/text can expose values; report type only for editable controls.
     const editable=el.matches('input,textarea,select')||el.isContentEditable;

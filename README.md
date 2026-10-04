@@ -28,25 +28,27 @@ Without an OpenAI key, the sandbox compiles actual entered answers into selected
 
 Copy `.dev.vars.example` to ignored `.dev.vars` and configure credentials locally. Browser login alone does not connect the application. Configure separate ElevenLabs expert/tutor agents with the selected v4 Turbo voice model, OpenAI backend access, and a Notion connection to the demo data source. Set `MODE=live` and `APP_ORIGIN` in runtime configuration; see [server setup](docs/server-setup.md) for availability and schema configuration. Never expose API keys in the browser or commit them.
 
-Live provider adapters are implemented but account calls, model quality, agent configuration and Notion writes remain **unverified until credentials are configured and those tests run**. This is a working local foundation, not a completed full-suite or hackathon-compliance claim.
+Real ElevenLabs expert/tutor exchanges and Chrome window capture have been exercised with labeled synthetic narration. OpenAI vision and Notion writes remain **unverified until credentials are configured and those tests run**. This is a working local foundation, not a completed full-suite or hackathon-compliance claim.
 
 ## Verified and pending
 
-Verified locally: TypeScript, deterministic scheduling and provider-safety tests, actual local Durable Object API integration, and the browser Capture → Map → Teach → blocked proposal → correction → explicit sandbox save journey. Browser automation uses a synthetic test stream; it does not verify OS screen-sharing permissions or hardware capture. Optional extension syntax/privacy tests and the Swift package build pass.
+Verified locally: TypeScript, deterministic scheduling and provider-safety tests, actual local Durable Object API integration, and the browser Capture → Map → Teach → blocked proposal → correction → explicit sandbox save journey. Browser automation uses a synthetic test stream; it does not verify OS screen-sharing permissions or hardware capture. Reload recovery, a tab-local confirmed-skill catalog, urgent-case completion, privacy leases and companion evidence polling are implemented. Extension privacy tests and isolated unpacked Chromium runtime checks pass. The native companion has a reproducible local app bundle; see its dedicated guide for the latest platform checks.
 
-Pending: live ElevenLabs/OpenAI/Notion integration, actual native/extension permission and capture tests, multilingual tutoring, multiple-expert comparison, generalized task/person schemas, reconciliation UI, user/team authentication and deployment. Technical pre-save enforcement applies to our controlled write path; direct Notion autosave is outside it.
+Pending: OpenAI/Notion integration, native hardware capture and toolbar-granted extension screenshots, multilingual tutoring, multiple-expert comparison, generalized task/person schemas, reconciliation UI, user/team authentication and deployment. Technical pre-save enforcement applies to our controlled write path; direct Notion autosave is outside it.
 
 ## Checks
 
 ```sh
 npm run check
-node apps/chrome-extension/panel.test.mjs
+npm run test:extension
+npm run test:extension:runtime
 # With both local servers running:
 node tests/api.integration.mjs
 node tests/browser.integration.mjs
+npm run test:lease
 ```
 
-The browser test requires a Playwright Chromium installation (`npx playwright install chromium`). [Capture clients](docs/capture-clients.md) documents installation and remaining platform limitations. [Final review](docs/reviews/final-engineering-review.md) and [implementation results](docs/reviews/implementation-results.md) separate review, build and runtime evidence.
+The browser test requires a Playwright Chromium installation (`npx playwright install chromium`). [Capture clients](docs/capture-clients.md) documents installation and remaining platform limitations. [Final review](docs/reviews/final-engineering-review.md) and [implementation results](docs/reviews/implementation-results.md) and [suite validation](docs/reviews/suite-validation.md) separate review, build and runtime evidence. The opt-in `RUN_LIVE_VOICE=1 npm run test:voice` test consumes configured ElevenLabs usage; it uses explicitly synthetic text and a muted fake microphone.
 
 ## Contribution and publication
 

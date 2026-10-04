@@ -15,7 +15,7 @@ export type Task = z.infer<typeof TaskSchema>;
 export const RuleKind = z.enum(['no_overlap','availability','customer_only','skill_match','dependency_ready','focus_block','review_buffer','blocked_followup']);
 export const EvidenceSchema = z.object({ id: z.string(), sessionId: z.string(), epoch: z.number().int(), at: z.string(), kind: z.enum(['frame','answer','activity']), text: z.string(), image: z.string().optional() });
 export type Evidence = z.infer<typeof EvidenceSchema>;
-export const AnswerSchema = z.object({id:z.string(), stage:z.enum(['capture','debrief']), question:z.string(), answer:z.string().min(1), evidenceIds:z.array(z.string()), ruleKinds:z.array(RuleKind), guardrail:z.boolean()});
+export const AnswerSchema = z.object({id:z.string().uuid(), stage:z.enum(['capture','debrief']), question:z.string().min(1).max(2000), answer:z.string().min(1).max(10000), evidenceIds:z.array(z.string()).min(1).max(100), ruleKinds:z.array(RuleKind).max(8), guardrail:z.boolean()});
 export type Answer = z.infer<typeof AnswerSchema>;
 export const RuleSchema = z.object({ id:z.string(), kind:RuleKind, title:z.string(), explanation:z.string(), evidenceIds:z.array(z.string()).min(1), expertQuote:z.string().min(1), parameters:z.object({ bufferMinutes:z.number().min(0).max(1440).optional() }).default({}) });
 export type Rule = z.infer<typeof RuleSchema>;
@@ -23,11 +23,14 @@ export const WorkMapSchema = z.object({id:z.string(),version:z.number().int().po
 export type WorkMap = z.infer<typeof WorkMapSchema>;
 export type Finding = { ruleId:string; taskIds:string[]; severity:'block'|'warning'; message:string; expertQuote:string; evidenceIds:string[] };
 export type Validation = { allowed:boolean; findings:Finding[]; mapVersion:number; checkedAt:string };
+export const VisualCoachModelSchema = z.object({summary:z.string().max(1200),concerns:z.array(z.object({ruleId:z.string(),visibleBasis:z.string().min(1).max(1000),message:z.string().min(1).max(1000)}).strict()).max(8),nextQuestion:z.string().max(600),uncertain:z.boolean()}).strict();
+export type VisualCoach = {frameId:string;at:string;mapVersion:number;summary:string;concerns:{ruleId:string;visibleBasis:string;message:string;expertQuote:string;evidenceIds:string[]}[];nextQuestion:string;uncertain:boolean};
 export type Availability = { person:z.infer<typeof Person>; skill:string[]; start:string; end:string };
-export type Session = { id:string; epoch:number; recording:boolean; phase:'capture'|'map'|'teach'; mode:'sandbox'|'live'; evidence:Evidence[]; answers:Answer[]; map:WorkMap|null; tasks:Task[]; availability:Availability[]; validation:Validation|null; commitStatus:'idle'|'writing'|'complete'|'partial'|'unknown'; revision:number };
-export type Capabilities = { elevenLabs:boolean; openAI:boolean; notion:boolean; mode:'sandbox'|'live'; model:string; voiceModel:string };
+export type LearningProgress = { checks:number; blockedChecks:number; encounteredRuleIds:string[]; resolvedRuleIds:string[] };
+export type Session = { progress?:LearningProgress; id:string; epoch:number; recording:boolean; phase:'capture'|'map'|'teach'; mode:'sandbox'|'live'; evidence:Evidence[]; answers:Answer[]; map:WorkMap|null; tasks:Task[]; availability:Availability[]; validation:Validation|null; commitStatus:'idle'|'writing'|'complete'|'partial'|'unknown'; revision:number };
+export type Capabilities = { elevenLabs:boolean; openAI:boolean; notion:boolean; mode:'sandbox'|'live'; model:string; voiceModel:string; accessCodeRequired:boolean };
 
-// Bearer session capability is returned once at creation and retained in browser memory.
+// Bearer session capability is returned once at creation and retained in tab-scoped sessionStorage by the browser; server stores only a digest.
 // Every session request carries Authorization: Bearer <token>; never put it in a URL.
 // API: GET /api/config -> Capabilities
 // POST /api/sessions {mode} -> {session, token}
@@ -44,3 +47,8 @@ export type Capabilities = { elevenLabs:boolean; openAI:boolean; notion:boolean;
 // POST /api/sessions/:id/voice {role:'expert'|'tutor'} -> {signedUrl:string}
 // POST /api/sessions/:id/observe {epoch:number,image:string} -> {question:string,ruleKinds:string[],guardrail:boolean}
 // GET /api/sessions/:id/export -> {markdown:string,map:WorkMap}
+
+// POST /api/sessions/:id/heartbeat {epoch} -> {expiresAt:number}; refresh <=15s while recording (60s lease).
+// POST /api/sessions/:id/delete {confirmed:true} -> {deleted:true}; paused sessions only, revokes capability and erases local evidence/journal.
+
+// POST /api/sessions/:id/coach {epoch,frameId} -> VisualCoach; latest current-epoch learner frame, confirmed map, advisory only.

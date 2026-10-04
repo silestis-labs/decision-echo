@@ -1,8 +1,8 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><title>Decision Echo Capture</title><body>
-<h1>Capture controls</h1><p>Shares clicked control names and shortcut categories, never typed values. Select a tab explicitly. Capture stays in this panel's memory. In the workspace, explicitly reveal/copy the optional capture session capability, then enter it below. Configure the backend EXTENSION_ORIGIN to this installed extension's exact chrome-extension:// ID.</p>
-<label>Workspace (loopback only)<input id="endpoint" value="http://localhost:8787"></label><br>
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Decision Echo Capture</title><style>body{font:14px system-ui;color:#172b48;background:#f5f7fb;padding:16px;max-width:440px}h1{font-size:22px}p{line-height:1.5}label{display:block;margin:12px 0}input:not([type=checkbox]){display:block;box-sizing:border-box;width:100%;padding:9px;margin-top:5px;border:1px solid #bbc6d5;border-radius:6px}button{padding:9px;margin:4px;border:1px solid #bbc6d5;border-radius:6px;background:white;cursor:pointer}#start{background:#172b48;color:white}#status{background:white;padding:12px;border-radius:6px}code{overflow-wrap:anywhere}</style><body>
+<h1>Capture controls</h1><p>Backend EXTENSION_ORIGIN: <code id="extension-origin"></code></p><p>Shares clicked control names and shortcut categories, never typed values. Select a tab explicitly and click its extension toolbar action to grant capture permission. Capture stays in this panel's memory. In the workspace, explicitly reveal/copy the optional capture session capability, then enter it below. Configure the backend EXTENSION_ORIGIN to this installed extension's exact chrome-extension:// ID.</p>
+<label>Workspace (loopback only)<input id="endpoint" value="http://127.0.0.1:8787"></label><br>
 <label>Session ID<input id="session"></label><br><label>Session bearer token<input id="token" type="password" autocomplete="off"></label><br>
 <label>Allowed target origin<input id="origin" placeholder="https://www.notion.so"></label><br>
 <label><input id="frames" type="checkbox">Also capture this tab's visible screenshot every 2 seconds (may contain personal data)</label><br>
-<button id="start">Consent and capture current tab</button><button id="stop">Off record</button><p id="status" role="status">Not recording</p>
+<button id="start">Consent and capture current tab</button><button id="stop">Off record</button><button id="forget">Forget local credentials</button><p id="status" role="status">Not recording</p>
 <script src="panel.js"></script></body></html>
