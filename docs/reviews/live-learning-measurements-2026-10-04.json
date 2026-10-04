@@ -3,11 +3,11 @@
   "metrics": [
     {
       "operation": "six_answer_UI_compile",
-      "latencyMs": 14931
+      "latencyMs": 15380
     },
     {
       "operation": "controlled_overlap_check",
-      "latencyMs": 77
+      "latencyMs": 81
     }
   ],
   "scope": "Synthetic answers through real UI; real OpenAI compile; controlled Atlas overlap/correction/save; test-owned canvas transport"

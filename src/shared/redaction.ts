@@ -47,7 +47,19 @@ export function redactText(input: string): Redaction {
   let text = input, redacted = 0;
   for (const { label, pattern, valid } of recognizers) {
     text = text.replace(pattern, match => {
-      if (valid && !valid(match)) return match;
+      if (valid && !valid(match)) {
+        // A variable-length IBAN candidate can greedily include a following uppercase
+        // word. Check complete whitespace-delimited prefixes before retaining it.
+        // Preserve the suffix rather than redacting unrelated narration with the IBAN.
+        if (label === 'IBAN') {
+          for (let end = match.length - 1; end >= 15; end--) {
+            if (match[end] !== ' ') continue;
+            const prefix = match.slice(0, end);
+            if (iban(prefix)) { redacted++; return `<IBAN>${match.slice(end)}`; }
+          }
+        }
+        return match;
+      }
       redacted++;
       return `<${label}>`;
     });

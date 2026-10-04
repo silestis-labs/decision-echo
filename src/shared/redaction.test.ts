@@ -14,6 +14,22 @@ describe('personal data redaction', () => {
     expect(redactText(planner)).toEqual({ text: planner, redacted: 0 });
   });
 
+  it('redacts a valid IBAN without swallowing adjacent uppercase narration', () => {
+    for (const [input, suffix] of [
+      ['BE68 5390 0754 7034 NOTE', ' NOTE'],
+      ['BE68539007547034 VAT', ' VAT'],
+      ['BE68 5390 0754 7034 NOTE VAT', ' NOTE VAT'],
+    ]) {
+      expect(redactText(input)).toEqual({ text: `<IBAN>${suffix}`, redacted: 1 });
+    }
+    expect(redactFields({ answer: 'Use BE68 5390 0754 7034 NOTE for the test.' })).toEqual({ answer: 'Use <IBAN> NOTE for the test.' });
+  });
+
+  it('does not redact checksum-invalid IBAN prefixes followed by uppercase text', () => {
+    const input = 'BE00539007547034 NOTE';
+    expect(redactText(input)).toEqual({ text: input, redacted: 0 });
+  });
+
   it('returns ordinary text unchanged on the fast path', () => {
     expect(redactText('Jonas only, because the client asked for him.')).toEqual({ text: 'Jonas only, because the client asked for him.', redacted: 0 });
   });

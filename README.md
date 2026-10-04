@@ -30,6 +30,8 @@ Copy `.dev.vars.example` to ignored `.dev.vars` and configure credentials locall
 
 Configure `ELEVENLABS_API_KEY`, separate expert/tutor agent IDs and `OPENAI_API_KEY`; use account-accessible models. Defaults use `gpt-6.1-sol` for Work Map compilation and learner visual coaching, and Vertex `gemini-3.5-flash-lite` with minimal thinking for short screenshot observations. The optional OpenAI observation route uses `gpt-6-luna` with low reasoning/high image detail. See [server setup](docs/server-setup.md) for workload overrides and [local comparison](docs/reviews/luna-sol-comparison-2026-10-04.md) for measured limits. Configure the selected v4 Turbo voice on both ElevenLabs agents. Keep keys server-side and out of Git.
 
+For a concrete rehearsal showing an unseen-case mistake, correction and changed expert rule, follow the [demo walkthrough](docs/demo-walkthrough.md). The workspace shows saved interview progress and lets you compare each rule with its linked expert evidence.
+
 ## Verified and pending
 
 The [Gemini activation review](docs/reviews/gemini-observation-activation-2026-10-04.md) records the current provider routing and a real Gemini/ElevenLabs synthetic planner integration test.

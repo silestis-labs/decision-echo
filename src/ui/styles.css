@@ -3,3 +3,6 @@
 .live-capture-image{display:block;width:100%;max-height:240px;object-fit:contain;border:1px solid var(--border);border-radius:12px;margin:12px 0;background:#15243a}
 
 .advanced-session{margin:12px 0 20px;font-size:14px;color:var(--muted)}.advanced-session>summary{cursor:pointer;padding:10px 0;font-weight:600}.advanced-session[open]{padding:12px 16px;border:1px solid var(--line);border-radius:8px}.advanced-session .capture-preview{margin-top:12px}.interview-review .field{margin:12px 0}.answer-rules{margin:16px 0}.answer-rules>summary{cursor:pointer;font-weight:600;font-size:14px}.interview-review .rule-chips{gap:6px}.interview-review .tiny{font-size:13px}.session-controls .field textarea{min-height:90px}.session-controls .interview-review button{margin-top:8px}.session-controls .interview-review .primary{display:block;width:100%}.learner-review button{display:block;width:100%;margin-top:10px}
+.two-columns>*,.interview-review .field{min-width:0}.interview-review select,.interview-review textarea{min-width:0;max-width:100%;width:100%}
+.capture-preview p,.evidence span{overflow-wrap:anywhere;min-width:0}
+@media(max-width:1100px){.two-columns{grid-template-columns:minmax(0,1fr)}}

@@ -1,14 +1,14 @@
 {
-  "checkedAt": "2026-10-04T09:40:47.473Z",
+  "checkedAt": "2026-10-04T11:05:43.644Z",
   "status": "passed",
   "model": "gemini-3.5-flash-lite",
   "measurements": {
-    "voiceConnectMs": 851,
-    "editToActivityEvidenceMs": 33,
+    "voiceConnectMs": 847,
+    "editToActivityEvidenceMs": 35,
     "renderedPlannerJpegBytes": 62136,
-    "realObserveMs": 2000,
-    "voiceProbeToGroundedReplyMs": 981,
-    "totalMs": 4729
+    "realObserveMs": 803,
+    "voiceProbeToGroundedReplyMs": 986,
+    "totalMs": 3438
   },
   "checks": {
     "realUiAssigneeChangedToLea": true,
@@ -158,13 +158,140 @@
         "stage": "real_vision_observe",
         "category": "HTTP_502"
       }
+    },
+    {
+      "checkedAt": "2026-10-04T09:40:47.473Z",
+      "status": "passed",
+      "model": "gemini-3.5-flash-lite",
+      "measurements": {
+        "voiceConnectMs": 851,
+        "editToActivityEvidenceMs": 33,
+        "renderedPlannerJpegBytes": 62136,
+        "realObserveMs": 2000,
+        "voiceProbeToGroundedReplyMs": 981,
+        "totalMs": 4729
+      },
+      "checks": {
+        "realUiAssigneeChangedToLea": true,
+        "activityEvidenceRecordsJonasToLea": true,
+        "editDidNotAutosaveServerPlan": true,
+        "observeReturnedQuestion": true,
+        "observeMentionsVisibleLeaOrJonas": true,
+        "observeReturnedCustomerOnlyOperator": true,
+        "voiceIdentifiesEditedPresentationAndLeaWithoutNamesInProbe": true,
+        "noBrowserRuntimeErrors": true,
+        "syntheticSessionDeleted": true
+      },
+      "limitations": [
+        "Browser display-media uses a static synthetic canvas; actual planner pixels are supplied by a direct Playwright element screenshot to the real observe endpoint.",
+        "Automatic browser observe calls for the permission-fixture canvas are locally stubbed to avoid billing and false screen-understanding claims.",
+        "Voice uses labeled synthetic typed narration and a fake muted microphone; no speech recognition or OS permissions are verified.",
+        "This tests a synthetic planning edit and provider context transfer; no Notion writes, human expert rule learning or universal save interception."
+      ],
+      "observationReasoning": "minimal",
+      "observationImageDetail": "default",
+      "compileAndCoachModel": "gpt-6.1-sol",
+      "syntheticEvidence": {
+        "observationQuestion": "Why is Lea assigned to Finalize Client Presentation despite the Jonas only preference?",
+        "agentReply": "ai [surprised] I see the event showing an edit to the task Finalize Client Presentation, changing the person from Jonas to Lea. [cautious] Since I must treat screen data as untrusted and cannot infer rules as facts, I need your confirmation on this observation. [inquisitive] Is it correct that you intended to reassign this specific task to Lea, and under what conditions should I refuse or escalate such a change in the future?"
+      }
+    },
+    {
+      "checkedAt": "2026-10-04T10:55:17.563Z",
+      "status": "failed",
+      "model": "gemini-3.5-flash-lite",
+      "measurements": {
+        "voiceConnectMs": 1362,
+        "editToActivityEvidenceMs": 58,
+        "renderedPlannerJpegBytes": 62655,
+        "totalMs": 2765
+      },
+      "checks": {
+        "realUiAssigneeChangedToLea": true,
+        "activityEvidenceRecordsJonasToLea": true,
+        "editDidNotAutosaveServerPlan": true,
+        "syntheticSessionDeleted": true
+      },
+      "limitations": [
+        "Browser display-media uses a static synthetic canvas; actual planner pixels are supplied by a direct Playwright element screenshot to the real observe endpoint.",
+        "Automatic browser observe calls for the permission-fixture canvas are locally stubbed to avoid billing and false screen-understanding claims.",
+        "Voice uses labeled synthetic typed narration and a fake muted microphone; no speech recognition or OS permissions are verified.",
+        "This tests a synthetic planning edit and provider context transfer; no Notion writes, human expert rule learning or universal save interception."
+      ],
+      "observationReasoning": "minimal",
+      "observationImageDetail": "default",
+      "compileAndCoachModel": "gpt-6.1-sol",
+      "failure": {
+        "stage": "real_vision_observe",
+        "category": "HTTP_502"
+      }
+    },
+    {
+      "checkedAt": "2026-10-04T11:02:51.697Z",
+      "status": "failed",
+      "model": "gemini-3.5-flash-lite",
+      "measurements": {
+        "voiceConnectMs": 1363,
+        "editToActivityEvidenceMs": 44,
+        "renderedPlannerJpegBytes": 62136,
+        "totalMs": 27419
+      },
+      "checks": {
+        "realUiAssigneeChangedToLea": true,
+        "activityEvidenceRecordsJonasToLea": true,
+        "editDidNotAutosaveServerPlan": true,
+        "syntheticSessionDeleted": true
+      },
+      "limitations": [
+        "Browser display-media uses a static synthetic canvas; actual planner pixels are supplied by a direct Playwright element screenshot to the real observe endpoint.",
+        "Automatic browser observe calls for the permission-fixture canvas are locally stubbed to avoid billing and false screen-understanding claims.",
+        "Voice uses labeled synthetic typed narration and a fake muted microphone; no speech recognition or OS permissions are verified.",
+        "This tests a synthetic planning edit and provider context transfer; no Notion writes, human expert rule learning or universal save interception."
+      ],
+      "observationReasoning": "minimal",
+      "observationImageDetail": "default",
+      "compileAndCoachModel": "gpt-6.1-sol",
+      "failure": {
+        "stage": "real_vision_observe",
+        "category": "HTTP_502"
+      }
+    },
+    {
+      "checkedAt": "2026-10-04T11:03:34.400Z",
+      "status": "failed",
+      "model": "gemini-3.5-flash-lite",
+      "measurements": {
+        "voiceConnectMs": 1360,
+        "editToActivityEvidenceMs": 39,
+        "renderedPlannerJpegBytes": 62136,
+        "totalMs": 27221
+      },
+      "checks": {
+        "realUiAssigneeChangedToLea": true,
+        "activityEvidenceRecordsJonasToLea": true,
+        "editDidNotAutosaveServerPlan": true,
+        "syntheticSessionDeleted": true
+      },
+      "limitations": [
+        "Browser display-media uses a static synthetic canvas; actual planner pixels are supplied by a direct Playwright element screenshot to the real observe endpoint.",
+        "Automatic browser observe calls for the permission-fixture canvas are locally stubbed to avoid billing and false screen-understanding claims.",
+        "Voice uses labeled synthetic typed narration and a fake muted microphone; no speech recognition or OS permissions are verified.",
+        "This tests a synthetic planning edit and provider context transfer; no Notion writes, human expert rule learning or universal save interception."
+      ],
+      "observationReasoning": "minimal",
+      "observationImageDetail": "default",
+      "compileAndCoachModel": "gpt-6.1-sol",
+      "failure": {
+        "stage": "real_vision_observe",
+        "category": "HTTP_502"
+      }
     }
   ],
   "observationReasoning": "minimal",
   "observationImageDetail": "default",
   "compileAndCoachModel": "gpt-6.1-sol",
   "syntheticEvidence": {
-    "observationQuestion": "Why is Lea assigned to Finalize Client Presentation despite the Jonas only preference?",
-    "agentReply": "ai [surprised] I see the event showing an edit to the task Finalize Client Presentation, changing the person from Jonas to Lea. [cautious] Since I must treat screen data as untrusted and cannot infer rules as facts, I need your confirmation on this observation. [inquisitive] Is it correct that you intended to reassign this specific task to Lea, and under what conditions should I refuse or escalate such a change in the future?"
+    "observationQuestion": "Why is Lea assigned to Finalize Client Presentation despite the 'Jonas only' preference?",
+    "agentReply": "ai I see the task Finalize Client Presentation was edited, and the person assigned is now Lea. Should I stop, refuse, or escalate if I notice conflicting assignments like this in the future?"
   }
 }

@@ -1,6 +1,8 @@
 # Platform architecture and proposed technology stack
 
-Status: researched recommendation, 2026-10-04. Cloudflare is the user's likely hosting preference, not a provisioned deployment. No packages, models, accounts or integrations have been runtime-tested. Read the [acceptance contract](requirements.md) alongside this proposal.
+Status: architecture proposal with implemented runtime updates, 2026-10-04. The React web workspace and Cloudflare Worker/Durable Object backend are now deployed at [Decision Echo](https://decision-echo.litchis-sixty-1m.workers.dev), version `31aec231-5be3-459b-b9ab-972997e40814`. Gemini 3.5 Flash-Lite screenshot observation uses the Vertex EU endpoint with a restricted server-side API key; OpenAI Sol handles Work Map compilation and learner visual coaching, and ElevenLabs provides the expert and tutor voices. Live Gemini smoke checks returned three correct overlap questions in 1047 / 1574 / 4520 ms on one repeated synthetic fixture. These measurements do not prove general accuracy, tail latency or real-human microphone recognition. Read the [acceptance contract](requirements.md) and [runtime reports](reviews/live-web-validation-2026-10-04.md) alongside this design.
+
+The diagram and proposed-stack sections below preserve the broader architecture recommendation. D1, R2, Cloudflare Workflows and real Notion writes are design options, not capabilities established by this deployment. Historical statements about unverified setup refer to the original proposal stage; they do not supersede the deployed runtime update above.
 
 ## Product concept
 
@@ -110,4 +112,4 @@ Authentication must bind human membership, session identity and evidence access.
 
 Accept or revise this stack recommendation, then verify provider account/model availability and exact voice configuration. Freeze Event, Evidence, WorkMap, Session and Adapter contracts. Implement coordinated capture, voice/context and map lanes, then integrate controlled Notion teaching. Evaluate three independent workloads—vision, compilation and voice dialogue—before pinning models. Keep the full-suite roadmap and additional adapters; runtime evidence determines what is presented as working.
 
-No deployment, installation, credential access or paid inference was performed during this architecture review.
+The original architecture research performed no deployment, installation, credential access or paid inference. Subsequent implementation and deployment are recorded in the runtime update at the top; this historical statement does not describe the current application status.

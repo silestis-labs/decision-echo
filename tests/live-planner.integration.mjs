@@ -3,6 +3,7 @@
 import {chromium,expect} from '@playwright/test';
 import assert from 'node:assert/strict';
 import {writeFile,readFile} from 'node:fs/promises';
+import {parseVars} from './helpers/vertex-benchmark.mjs';
 if(process.env.RUN_LIVE_PLANNER!=='1'){console.log('SKIP live planner: set RUN_LIVE_PLANNER=1 after authorizing provider usage.');process.exit(0);}
 const uiOrigin=process.env.TEST_UI_ORIGIN||'http://127.0.0.1:5173';
 const apiOrigin=process.env.TEST_API_ORIGIN||'http://127.0.0.1:8787';
@@ -21,7 +22,14 @@ try{
  await page.route('**/api/sessions/*/observe',route=>route.fulfill({json:{question:'',ruleKinds:[],guardrail:false}}));
  await page.goto(uiOrigin);
  const config=await (await page.request.get(`${apiOrigin}/api/config`)).json();assert(config.openAI&&config.elevenLabs,'Both providers must be configured');metrics.model=config.observationModel||config.model;metrics.observationReasoning=config.observationReasoning;metrics.observationImageDetail=config.observationImageDetail;metrics.compileAndCoachModel=config.model;
- stage='session_create';await page.getByRole('button',{name:'Start sandbox session →',exact:true}).click();await expect(page.getByRole('heading',{name:'Weekly planning',exact:true})).toBeVisible();
+ stage='session_create';
+ if(config.accessCodeRequired){
+  const vars=parseVars(await readFile('.dev.vars','utf8').catch(error=>{if(error.code==='ENOENT')return '';throw error;}));
+  const accessCode=process.env.DEMO_ACCESS_CODE||vars.DEMO_ACCESS_CODE;
+  assert(accessCode,'Local demo access code is required for the configured access gate');
+  await page.getByLabel('Demo access code',{exact:true}).fill(accessCode);
+ }
+ await page.getByRole('button',{name:'Start sandbox session →',exact:true}).click();await expect(page.getByRole('heading',{name:'Weekly planning',exact:true})).toBeVisible();
  await expect.poll(()=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1')||'[]').length),{timeout:10000}).toBeGreaterThan(0);
  ({id,token}=await page.evaluate(()=>{const ref=JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0];return {id:ref.id,token:ref.token};}));
  await page.getByText('Demo testing tools',{exact:true}).click().catch(async()=>{await page.getByText('Demo testing tools',{exact:false}).click();});

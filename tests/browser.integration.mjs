@@ -11,6 +11,9 @@ await page.route('**/api/**',route=>route.continue({url:worker.base+new URL(rout
 await page.addInitScript(()=>{navigator.mediaDevices.getDisplayMedia=async()=>{const c=document.createElement('canvas');c.width=800;c.height=450;const ctx=c.getContext('2d');ctx.fillStyle='#f5f6fa';ctx.fillRect(0,0,800,450);ctx.fillStyle='#12213b';ctx.font='24px sans-serif';ctx.fillText('Synthetic browser integration test screen',30,50);let tick=0;setInterval(()=>{ctx.fillStyle=tick%2?'#cc8844':'#4466aa';ctx.fillRect(700,350,50,50);ctx.fillStyle='#f5f6fa';ctx.fillRect(600,400,90,40);ctx.fillStyle='#12213b';ctx.fillText(String(tick++),610,430);},1000);const stream=c.captureStream(2);if(window.__deferCapture)await new Promise(resolve=>{window.__releaseCapture=resolve;});return stream;};});
 await page.goto('http://127.0.0.1:5173');
 await page.getByRole('button',{name:'Start sandbox session →',exact:true}).click();
+const workflow=page.getByRole('region',{name:'Learning workflow progress',exact:true});
+await expect(workflow).toContainText('guardrail still needed');
+await expect(workflow).toContainText('map not compiled');
 // Planner navigation and draft edits must not persist schedule changes.
 await expect(page.getByRole('heading',{name:'Weekly planning',exact:true})).toBeVisible();
 await expect(page.getByText('Atlas Data Correction',{exact:true})).toHaveCount(0);
@@ -129,6 +132,7 @@ if(i===0&&await page.getByRole('button',{name:'Exit full view',exact:true}).isVi
 await expect(page.getByText(`${i+1}/3 answers`,{exact:true})).toBeVisible();
 await expect(page.getByRole('textbox',{name:'Expert’s own answer',exact:true})).toHaveValue('');
 }
+await expect(workflow).toContainText('3/3 answers · guardrail recorded');
 await page.getByRole('button',{name:'Finish capture → debrief',exact:true}).click();
 for(let i=0;i<3;i++){
 await page.getByRole('textbox',{name:'New debrief question',exact:true}).fill(`Synthetic debrief question ${i}`);
@@ -140,7 +144,24 @@ await expect(page.getByText(`${i+1}/3 answers`,{exact:true})).toBeVisible();
 await expect(page.getByRole('textbox',{name:'Expert’s own answer',exact:true})).toHaveValue('');
 }
 await page.getByRole('button',{name:'Rebuild draft from all answers',exact:true}).click();
+await expect(workflow).toContainText('v1 draft');
+const draftEvidence=page.getByRole('region',{name:'Rule evidence review',exact:true});
+await draftEvidence.locator('.evidence-review-item').first().click();
+await expect(page.getByRole('dialog',{name:'Evidence detail',exact:true})).toBeVisible();
+await page.getByRole('button',{name:'Close evidence',exact:true}).click();
+await page.setViewportSize({width:390,height:844});
+await draftEvidence.scrollIntoViewIfNeeded();
+await page.screenshot({path:'/private/tmp/decision-echo-evidence-review-mobile.png'});
+const overflow=await page.evaluate(()=>Array.from(document.querySelectorAll('body *')).filter(e=>e.getBoundingClientRect().right>window.innerWidth||e.scrollWidth>e.clientWidth+1).slice(0,15).map(e=>({tag:e.tagName,cls:e.className,right:e.getBoundingClientRect().right,scroll:e.scrollWidth,client:e.clientWidth})));
+assert(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),`Evidence review must fit a mobile viewport: ${JSON.stringify(overflow)}`);
+await page.screenshot({path:'/private/tmp/decision-echo-evidence-review-mobile.png'});
+await page.setViewportSize({width:1440,height:1000});
+await draftEvidence.scrollIntoViewIfNeeded();
+await page.screenshot({path:'/private/tmp/decision-echo-evidence-review.png'});
 await page.getByRole('button',{name:'I confirm this is how I work',exact:true}).click();
+await expect(workflow).toContainText('v1 confirmed');
+const ruleEvidence=page.getByRole('region',{name:'Rule evidence review',exact:true});
+await expect(ruleEvidence).toContainText('Synthetic expert test answer');
 await page.getByRole('button',{name:'Open unseen learner case →',exact:true}).click();
 await expect(page.getByRole('heading',{name:'Weekly plan · unsaved proposal',exact:true})).toBeVisible();
 await page.getByLabel('Atlas Data Correction decision',{exact:true}).selectOption('Schedule');
@@ -153,11 +174,13 @@ await page.getByLabel('Atlas Data Correction start',{exact:true}).fill('2026-10-
 await page.getByLabel('Atlas Data Correction end',{exact:true}).fill('2026-10-08T11:00');
 await page.getByRole('button',{name:'Check with the learned rules',exact:true}).click();
 await expect(page.getByRole('heading',{name:'Pause before saving',exact:true})).toBeVisible();
+await expect(workflow).toContainText('blocking conflicts · proposal unsaved');
 await expect(page.getByRole('button',{name:'I approve · save sandbox plan',exact:true})).toBeDisabled();
 await page.getByRole('heading',{name:'Pause before saving',exact:true}).scrollIntoViewIfNeeded();
 await page.screenshot({path:'/private/tmp/decision-echo-intervention.png'});
 await page.getByLabel('Analyze Cohort Data start',{exact:true}).fill('2026-10-09T08:00');
 await page.getByLabel('Analyze Cohort Data end',{exact:true}).fill('2026-10-09T12:00');
+await expect(workflow).toContainText('Check your current proposal before saving');
 await page.getByRole('button',{name:'Focus planner',exact:true}).click();
 await page.getByText('Review plan',{exact:true}).click();
 await page.getByRole('button',{name:'Check with the learned rules',exact:true}).click();
