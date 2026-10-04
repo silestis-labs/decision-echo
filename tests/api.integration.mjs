@@ -53,6 +53,7 @@ let held=await api('/validate',{tasks:s.tasks,revision:s.revision});assert.equal
 s=await api('/recording',{recording:true,epoch:s.epoch});
 s=await api('/evidence',{epoch:s.epoch,kind:'frame',text:'Synthetic learner screen for coaching gate',image});
 const learnerFrame=s.evidence.at(-1).id;
+{const before=s.revision;const after=await api('/evidence',{epoch:s.epoch,kind:'activity',text:'Edited Atlas Data Correction: person Unassigned → Lea'});assert.equal(after.revision,before,'Evidence must not invalidate a pending plan revision');const checked=await api('/validate',{tasks:s.tasks,revision:before});assert.equal(typeof checked.validation.allowed,'boolean');s=checked.session;}
 await api('/coach',{epoch:s.epoch,frameId:frame},409);
 if(!(await call('/config')).openAI)await api('/coach',{epoch:s.epoch,frameId:learnerFrame},503);
 s=await api('/recording',{recording:false,epoch:s.epoch});
@@ -64,7 +65,7 @@ Object.assign(tasks.find(t=>t.id==='cohort'),{start:'2026-10-09T08:00:00+02:00',
 result=await api('/validate',{tasks,revision:s.revision});assert.equal(result.validation.allowed,true);
 await api('/commit',{tasks,revision:s.revision-1,mapVersion:s.map.version,confirmed:true},409);
 const results=await Promise.all([api('/commit',{tasks,revision:s.revision,mapVersion:s.map.version,confirmed:true}),api('/commit',{tasks,revision:s.revision,mapVersion:s.map.version,confirmed:true},409)]);
-assert.equal(results[0].commitStatus,'complete');s=await api('');assert.equal(s.commitStatus,'complete');assert.equal(s.progress.checks,3);assert.equal(s.progress.blockedChecks,2);assert(s.progress.resolvedRuleIds.includes('rule-no_overlap'));
+assert.equal(results[0].commitStatus,'complete');s=await api('');assert.equal(s.commitStatus,'complete');assert.equal(s.progress.checks,4);assert.equal(s.progress.blockedChecks,3);assert(s.progress.resolvedRuleIds.includes('rule-no_overlap'));
 await api('/delete',{confirmed:true});await api('',undefined,404);await api('/export',undefined,404);
 console.log('PASS actual local Durable Object API: capability auth, held-out isolation, evidence provenance, privacy epoch, confirmed-map gate, double booking, complete correction, stale revision and duplicate commit.');
 
