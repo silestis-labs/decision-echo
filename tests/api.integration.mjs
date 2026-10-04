@@ -53,6 +53,7 @@ let held=await api('/validate',{tasks:s.tasks,revision:s.revision});assert.equal
 s=await api('/recording',{recording:true,epoch:s.epoch});
 s=await api('/evidence',{epoch:s.epoch,kind:'frame',text:'Synthetic learner screen for coaching gate',image});
 const learnerFrame=s.evidence.at(-1).id;
+{const r=await api('/evidence',{epoch:s.epoch,kind:'activity',text:'Synthetic contact lea.example@northstar.example, +49 30 1234567'});assert.equal(r.evidence.at(-1).text,'Synthetic contact <EMAIL>, <PHONE>','Server must redact personal data in evidence text');s=r;}
 {const before=s.revision;const after=await api('/evidence',{epoch:s.epoch,kind:'activity',text:'Edited Atlas Data Correction: person Unassigned → Lea'});assert.equal(after.revision,before,'Evidence must not invalidate a pending plan revision');const checked=await api('/validate',{tasks:s.tasks,revision:before});assert.equal(typeof checked.validation.allowed,'boolean');s=checked.session;}
 await api('/coach',{epoch:s.epoch,frameId:frame},409);
 if(!(await call('/config')).openAI)await api('/coach',{epoch:s.epoch,frameId:learnerFrame},503);

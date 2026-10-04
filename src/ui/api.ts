@@ -1,3 +1,4 @@
+import { redactFields } from '../shared/redaction';
 import type { Session, Capabilities } from '../shared/contracts';
 export class RequestError extends Error { constructor(message:string,public status:number){super(message);} }
 export type SessionReference={id:string;token:string;createdAt:string;confirmed:boolean;mode:'sandbox'|'live'};
@@ -12,12 +13,14 @@ export function rememberSession(s:Session){if(!credential||credential.id!==s.id)
 export function selectSession(id:string){const ref=sessionReferences().find(r=>r.id===id);if(!ref)throw new Error('This tab does not have access to that session.');credential=ref;}
 export function forgetSession(id:string){persist(sessionReferences().filter(r=>r.id!==id));if(credential?.id===id)credential=null;}
 export function forgetSessions(){credential=null;try{sessionStorage.removeItem(STORAGE_KEY);}catch{/* Storage may be unavailable. */}}
+/** Evidence and answers are redacted on this device before upload; other request bodies are sent unchanged. */
+const redactUpload=(path:string,body:unknown)=>/\/(evidence|answers)$/.test(path)?redactFields(body):body;
 export async function api<T>(path:string,body?:unknown,signal?:AbortSignal,extraHeaders:Record<string,string>={}):Promise<T>{
  const controller=new AbortController();let timedOut=false;
  const abort=()=>controller.abort(signal?.reason);if(signal?.aborted)abort();else signal?.addEventListener('abort',abort,{once:true});
  const timer=setTimeout(()=>{timedOut=true;controller.abort();},35_000);
  try{
- const response=await fetch(`/api${path}`,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json',...(credential?{Authorization:`Bearer ${credential.token}`}:{}),...extraHeaders},...(body===undefined?{}:{body:JSON.stringify(body)}),signal:controller.signal});
+ const response=await fetch(`/api${path}`,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json',...(credential?{Authorization:`Bearer ${credential.token}`}:{}),...extraHeaders},...(body===undefined?{}:{body:JSON.stringify(redactUpload(path,body))}),signal:controller.signal});
  if(!response.ok){const value=await response.json().catch(()=>null) as {error?:unknown}|null;throw new RequestError(typeof value?.error==='string'?value.error:`Request failed (${response.status})`,response.status);}
  return await response.json().catch(()=>{throw new RequestError('The server returned an unreadable response. Reload the session before retrying a change.',502);}) as T;
  }catch(error){if(timedOut)throw new RequestError('The request timed out. Reload the session to check whether the change was saved before retrying.',408);throw error;}finally{clearTimeout(timer);signal?.removeEventListener('abort',abort);}

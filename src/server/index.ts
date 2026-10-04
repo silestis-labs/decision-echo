@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
+import { redactFields } from '../shared/redaction';
 import { AnswerSchema,TaskSchema,WorkMapSchema,RuleSchema,type Session,type Task } from '../shared/contracts';
 import { createSandboxSession,upgradeSandboxTemplate,compileMap,validatePlan,exportSkill } from '../domain/planning';
 import { ApiError,digest,constantEqual,readBody,imageSchema,requiresDemoAccess } from './safety';
@@ -101,10 +102,10 @@ export class EchoSession extends DurableObject<ServerEnv>{
   if(!s.recording||b.epoch!==s.epoch)throw new ApiError(409,'Capture paused or stale epoch');if(b.kind==='frame'&&!b.image)throw new ApiError(422,'A frame needs captured image data');if(b.image&&Number(this.ctx.storage.sql.exec<{total:number}>('SELECT COALESCE(SUM(length(image)),0) AS total FROM frame_assets').toArray()[0].total)+b.image.length>32_000_000)throw new ApiError(413,'Frame retention budget reached; start a new session');if(s.evidence.length>=MAX_EVIDENCE)throw new ApiError(413,'Evidence limit reached');
   if(b.kind==='activity'){const last=[...s.evidence].reverse().find(e=>e.kind==='activity'&&e.text===b.text);if(last&&Date.now()-Date.parse(last.at)<2000){await this.refreshLease();return Response.json(this.visible(s));}}
   // Evidence is not plan state: it must not invalidate a learner's pending check or commit revision.
-  s.evidence.push({id:crypto.randomUUID(),sessionId:s.id,at:now(),...b});this.save(s);await this.refreshLease();return Response.json(this.visible(s));
+  s.evidence.push({id:crypto.randomUUID(),sessionId:s.id,at:now(),...redactFields(b)});this.save(s);await this.refreshLease();return Response.json(this.visible(s));
  }
  if(action==='answers'){
-  const answer=AnswerSchema.strict().parse(body);if(s.evidence.length>=MAX_EVIDENCE)throw new ApiError(413,'Evidence limit reached');if(s.map?.status==='confirmed')throw new ApiError(409,'Confirmed map is immutable');if(s.answers.length>=30||s.answers.some(a=>a.id===answer.id))throw new ApiError(409,'Duplicate or too many answers');const frameIds=answer.evidenceIds.filter(id=>s.evidence.some(e=>e.id===id&&e.kind==='frame'&&e.sessionId===s.id));
+  const answer=redactFields(AnswerSchema.strict().parse(body));if(s.evidence.length>=MAX_EVIDENCE)throw new ApiError(413,'Evidence limit reached');if(s.map?.status==='confirmed')throw new ApiError(409,'Confirmed map is immutable');if(s.answers.length>=30||s.answers.some(a=>a.id===answer.id))throw new ApiError(409,'Duplicate or too many answers');const frameIds=answer.evidenceIds.filter(id=>s.evidence.some(e=>e.id===id&&e.kind==='frame'&&e.sessionId===s.id));
   if(!frameIds.length)throw new ApiError(422,'Answer must link an actual captured frame');
   const answerEvidence={id:crypto.randomUUID(),sessionId:s.id,epoch:s.epoch,at:now(),kind:'answer' as const,text:answer.answer};s.evidence.push(answerEvidence);answer.evidenceIds=[...frameIds,answerEvidence.id];s.answers.push(answer);s.revision++;this.save(s);return Response.json(this.visible(s));
  }
