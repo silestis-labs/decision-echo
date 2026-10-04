@@ -46,7 +46,7 @@ Decision Echo makes that transfer explicit:
 3. **Teach:** an ElevenLabs tutor helps the learner apply the confirmed rules to an unseen case. In our controlled planner, a conflicting proposal is blocked before saving, explained using the expert's evidence, and checked again after correction.
 4. **Carry the knowledge forward:** export the confirmed instructions and evidence references as `SKILL.md`.
 
-The current demonstration is weekly task planning in a Notion-style workspace. The product boundary is expert-to-learner judgment transfer across applications; planning is our first connected workflow.
+The current demonstration is weekly task planning in Decision Echo's built-in planning board. The product boundary is expert-to-learner judgment transfer across applications; planning is our first connected workflow.
 
 ## What the jury can try
 
@@ -143,7 +143,7 @@ The supported planning operators cover overlaps, availability, customer restrict
 | Compilation and visual coaching | OpenAI Responses | Structured draft rules from submitted expert evidence and advisory learner-screen interpretation. |
 | API and session authority | Hono, Cloudflare Worker, SQLite-backed Durable Objects | Capability checks, evidence, map versions, capture epochs, validation and controlled commit state. |
 | Planning policy | Typed domain operators and Zod contracts | Validate supported rules, source constraints and complete proposals. |
-| Application adapter | Synthetic planner; optional Notion API adapter | Read task facts and perform controlled writes within the configured schema. |
+| Application adapter | Built-in synthetic planning board | Read task facts and perform controlled writes within the configured schema. |
 | Capture companions | Chrome extension; Swift macOS companion | Optional capture paths using the same authenticated session protocol. |
 
 Current configured defaults are Vertex `gemini-3.5-flash-lite` for observation and `gpt-6.1-sol` for map compilation and learner visual coaching. The optional OpenAI observation route uses `gpt-6-luna`. These are account-dependent configuration choices, not universal availability claims. See [server setup](docs/server-setup.md) and the [observation comparison](docs/reviews/luna-sol-comparison-2026-10-04.md).
@@ -156,7 +156,7 @@ The [dated hosted release report](docs/reviews/release-verification-2026-10-04.m
 
 | Evidence | What was verified | Boundary |
 | --- | --- | --- |
-| Automated suite | TypeScript, 120 unit tests, build, GitHub CI, isolated API/browser workflows and documented extension runtime checks. | Isolated browser checks use synthetic media and mocked provider responses. |
+| Automated suite | TypeScript, 127 unit tests, build, GitHub CI, isolated API/browser workflows and documented extension runtime checks. | Isolated browser checks use synthetic media and mocked provider responses. |
 | Hosted provider workflow | Actual Gemini observation, OpenAI evidence-backed compilation, expert/tutor authorization, learned overlap rejection, rejected invalid commit, corrected sandbox save, export and off-record cleanup. | Six expert answers were explicitly synthetic. Voice authorization alone is not an audio conversation. |
 | Live conversation integration | Real ElevenLabs synthetic exchanges grounded in edited planner context. | Muted fake microphone in those exchanges. |
 | Separate human microphone check | Actual hosted speech transcription, retained answer/question pairing and off-record stopping screen and microphone. | Did not establish a complete six-answer human-confirmed Work Map. |
@@ -167,7 +167,6 @@ Earlier [live web validation](docs/reviews/live-web-validation-2026-10-04.md) an
 The working hosted demo is supervised, with these remaining boundaries:
 
 - The shared access code is a demo gate. Team accounts, invitations and cross-device skill synchronization remain future work.
-- Real Notion writes have not been verified. The demonstrated save is in the synthetic planner; direct external Notion autosave is outside our controlled gate.
 - Visual coaching is advisory. Universal desktop action interception, replay and model training from recordings are not implemented claims.
 - The planning schema currently uses named demo roles and supported rule types. Additional workflows need their own schemas, evidence review and adapter validation.
 - A complete human six-answer end-to-end rehearsal, native macOS hardware capture permissions, broader browser/OS coverage and production load/usage validation remain separate work.
