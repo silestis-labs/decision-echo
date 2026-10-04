@@ -8,6 +8,10 @@ Decision Echo turns an expert's screen moments and explanations into a reviewed,
 
 [Open the hosted demo](https://decision-echo.litchis-sixty-1m.workers.dev) · [Follow the demo walkthrough](docs/demo-walkthrough.md) · [Review the release evidence](docs/reviews/release-verification-2026-10-04.md) · [Run locally](#run-locally)
 
+| ▶ Demo video (56 s) | ▶ Technical walkthrough (56 s) |
+| --- | --- |
+| [![Demo video](docs/images/demo-video-poster.jpg)](docs/media/demo-video.mp4) | [![Technical walkthrough](docs/images/tech-video-poster.jpg)](docs/media/tech-video.mp4) |
+
 The hosted demo requires the shared access code supplied separately by the team. It uses fictional planning data. Real voice and screen analysis require the configured providers and browser permissions; the access gate is not a team-account system.
 
 ## See the product working
