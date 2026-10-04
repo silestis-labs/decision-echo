@@ -187,7 +187,7 @@ Copy `.dev.vars.example` to ignored `.dev.vars` and configure credentials locall
 
 Keep `MODE=sandbox` for the self-contained demo. It selects fictional task data while configured real providers remain active. Follow [server setup](docs/server-setup.md) for credential modes, property mapping and operating limits, and [ElevenLabs setup](docs/elevenlabs-agent-setup.md) for conversational roles. Keep all secrets server-side and out of Git.
 
-Public deployments require `DEMO_ACCESS_CODE` before sessions can be created. A non-local `APP_ORIGIN` without that secret fails closed. Deployment configuration and secrets must match the exact hosted origin.
+Public deployments require `DEMO_ACCESS_CODE` by default. For code-free jury access, explicitly set `DEMO_ACCESS_MODE=public`; the code field disappears and new sessions can start without the shared code. Session bearer tokens remain required. Without this opt-in, a non-local `APP_ORIGIN` without the secret fails closed. Deployment configuration and secrets must match the exact hosted origin.
 
 ## Reproduce the checks
 
