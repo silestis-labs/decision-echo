@@ -15,6 +15,7 @@ export interface SessionControlsProps {
   onAsk?: () => void;
   question?: string;
   progress?: string;
+  nextStep?: string;
   error?: string;
   notice?: string;
   children?: ReactNode;
@@ -27,7 +28,7 @@ export interface SessionControlsProps {
 export function SessionControls({
   title, recording, voiceStatus, voiceAvailable, voiceActivity, busy,
   startLabel = 'Start session', onStart, onPause, onAsk,
-  question, progress, error, notice, children, compact = false, askLabel = "Ask apprentice", reviewLabel = "Review answer",
+  question, progress, nextStep, error, notice, children, compact = false, askLabel = "Ask apprentice", reviewLabel = "Review answer",
 }: SessionControlsProps) {
   const titleId = useId();
   const [reviewOpen, setReviewOpen] = useState(Boolean(question));
@@ -64,8 +65,9 @@ export function SessionControls({
         </button>
       </div>
     </div>
-    {(question || progress || error || notice || children) && <div className="session-controls__body">
+    {(question || progress || nextStep || error || notice || children) && <div className="session-controls__body">
       {question && <p className="session-controls__question">{question}</p>}
+      {nextStep && <p className="session-controls__next-step">{nextStep}</p>}
       {progress && <p className="session-controls__progress">{progress}</p>}
       {notice && <p className="session-controls__notice">{notice}</p>}
       {error && <p className="session-controls__error" role="alert">{error}</p>}
