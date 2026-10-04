@@ -97,3 +97,5 @@
   .session-controls__actions { width: 100%; }
   .session-controls__body { padding: 0 18px 18px; }
 }
+
+.session-controls__next-step{font-size:13px;line-height:1.5;color:var(--text,#23354e);margin:0 0 10px}

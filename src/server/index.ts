@@ -1,3 +1,4 @@
+import {clientReportTask} from '../domain/planning';
 import { Hono } from 'hono';
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
@@ -142,7 +143,7 @@ export class EchoSession extends DurableObject<ServerEnv>{
   s.map={id:s.map.id,version:s.map.version+1,status:'draft',rules:b.rules,teachBack:b.teachBack};assertMap(s);s.validation=null;s.revision++;this.save(s);return Response.json(this.visible(s));
  }
  if(action==='teach'){
-  z.object({}).strict().parse(body);if(s.map?.status!=='confirmed')throw new ApiError(409,'Confirm map first');if(s.phase!=='teach'&&s.mode==='live'){const held=this.ctx.storage.sql.exec<{data:string}>('SELECT data FROM heldout WHERE id=1').toArray()[0];if(held)s.tasks.push(...JSON.parse(held.data));}s.phase='teach';s.revision++;this.save(s);return Response.json(this.visible(s));
+  z.object({}).strict().parse(body);if(s.map?.status!=='confirmed')throw new ApiError(409,'Confirm map first');if(s.phase!=='teach'&&s.mode==='live'){const held=this.ctx.storage.sql.exec<{data:string}>('SELECT data FROM heldout WHERE id=1').toArray()[0];if(held)s.tasks.push(...JSON.parse(held.data));}if(s.phase!=='teach'&&s.mode==='sandbox'&&s.map.rules.some(rule=>rule.kind==='client_work_window')){s.tasks=s.tasks.filter(task=>task.id!=='atlas');s.tasks.push(clientReportTask());}s.phase='teach';s.revision++;this.save(s);return Response.json(this.visible(s));
  }
  if(action==='validate'||action==='commit'){
   const b=(action==='commit'?planSchema.extend({mapVersion:z.number().int(),confirmed:z.literal(true)}):planSchema).parse(body);

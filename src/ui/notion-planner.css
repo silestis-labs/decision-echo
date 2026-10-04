@@ -43,3 +43,10 @@ body:has(.np-expanded) .workspace main>section:has(.np-expanded)>:not(.np-expand
   .np-expanded:has(.np-detail) .np-session-rail{height:230px}
   .np-expanded:has(.np-detail) .session-controls__body{display:none}
 }
+
+/* Keep scheduling decisions visible; source metadata remains available on demand. */
+.np-root .np-task-table--essential{min-width:1100px!important}
+.np-task-table--essential :is(th,td):is(:nth-child(2),:nth-child(3),:nth-child(4),:nth-child(9),:nth-child(10),:nth-child(11),:nth-child(15),:nth-child(16),:nth-child(17)){display:none}
+.np-property-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.np-root .np-properties-toggle{border:1px solid var(--np-line);border-radius:4px;background:#fff;padding:4px 8px;font-size:11px;white-space:nowrap}
+.np-root .np-properties-toggle:hover{background:#f7f7f5}

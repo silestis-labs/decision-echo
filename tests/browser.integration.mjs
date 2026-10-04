@@ -14,6 +14,14 @@ await page.getByRole('button',{name:'Start sandbox session →',exact:true}).cli
 const workflow=page.getByRole('region',{name:'Learning workflow progress',exact:true});
 await expect(workflow).toContainText('guardrail still needed');
 await expect(workflow).toContainText('map not compiled');
+// Essential scheduling fields stay visible; detailed source properties remain accessible.
+await expect(page.locator('.np-task-table').getByRole('columnheader',{name:'Customer',exact:true})).toBeHidden();
+await expect(page.getByLabel('Finalize Client Presentation assignee',{exact:true})).toBeVisible();
+await page.getByRole('button',{name:'Show all properties',exact:true}).click();
+await expect(page.locator('.np-task-table').getByRole('columnheader',{name:'Customer',exact:true})).toBeVisible();
+await expect(page.locator('.np-task-table').getByRole('columnheader',{name:'Review status',exact:true})).toBeVisible();
+await page.getByRole('button',{name:'Show planning essentials',exact:true}).click();
+await expect(page.locator('.np-task-table').getByRole('columnheader',{name:'Customer',exact:true})).toBeHidden();
 // Planner navigation and draft edits must not persist schedule changes.
 await expect(page.getByRole('heading',{name:'Weekly planning',exact:true})).toBeVisible();
 await expect(page.getByText('Atlas Data Correction',{exact:true})).toHaveCount(0);
