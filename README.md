@@ -34,13 +34,15 @@ For a concrete rehearsal showing an unseen-case mistake, correction and changed 
 
 ## Verified and pending
 
+The [hosted release verification](docs/reviews/release-verification-2026-10-04.md) records the current deployed web workflow, 120 tests, actual provider calls and the separate human microphone check.
+
 The [Gemini activation review](docs/reviews/gemini-observation-activation-2026-10-04.md) records the current provider routing and a real Gemini/ElevenLabs synthetic planner integration test.
 
 The [live web validation report](docs/reviews/live-web-validation-2026-10-04.md) records an actual Chrome screen-share run with real OpenAI observation/compilation, both ElevenLabs agents, six explicitly synthetic typed answers, confirmed map, a blocked learner mistake, correction, explicit local save and downloaded skill. A real microphone transcript was not tested in that run. Model output remains advisory until reviewed; supported scheduling operators, rather than arbitrary prose, drive controlled validation.
 
 Local automated checks cover TypeScript, source constraints, learned scheduling rules, provider safety, isolated Durable Object APIs, recovery, stale revisions, capture leases, browser workflow, off-record behavior and skill export. Each report distinguishes mock media/provider fixtures from actual provider calls. Optional capture clients have separate [platform verification](docs/capture-clients.md).
 
-Still pending for a production team service: authenticated accounts and cross-device skill synchronization, production deployment and rate limits, real human microphone end-to-end verification, generalized task/person schemas and broader browser/OS coverage. Native macOS capture permission remains a separate platform gate. Real Notion writes remain unverified and are not required for this sandbox demo. Our controlled planner has an explicit save gate; direct Notion autosave remains outside it.
+Still pending for a production team service: authenticated accounts and cross-device skill synchronization, production usage quotas and load validation, complete human six-answer microphone end-to-end verification, generalized task/person schemas and broader browser/OS coverage. Native macOS capture permission remains a separate platform gate. Real Notion writes remain unverified and are not required for this sandbox demo. Our controlled planner has an explicit save gate; direct Notion autosave remains outside it.
 
 Public deployments require `DEMO_ACCESS_CODE` before new sessions can be created. This is a shared demo gate, not per-user authentication. The server fails closed for a non-local `APP_ORIGIN` without that secret. Set the exact deployed origin and configure secrets before opening the demo to others.
 
@@ -69,4 +71,4 @@ The private knowledge checkout is independent of this repository. Private source
 
 Copyright © 2026 the Decision Echo authors. All rights reserved.
 
-This repository is published for review of a hackathon submission. No license is granted: you may view the code, but you may not copy, modify, distribute or use it without prior written permission.
+This repository is prepared for review of a hackathon submission. No license is granted: you may view the code, but you may not copy, modify, distribute or use it without prior written permission.
