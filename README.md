@@ -62,3 +62,9 @@ The browser test requires a Playwright Chromium installation (`npx playwright in
 Start with [CONTRIBUTING.md](CONTRIBUTING.md), [AGENTS.md](AGENTS.md), [agent bootstrap](docs/agent-bootstrap.md) and [publication policy](docs/publication-policy.md). The coordinator owns contracts and integration; specialists receive bounded modules.
 
 The private knowledge checkout is independent of this repository. Private source materials, recordings, wiki, credentials and real workspace identifiers stay out of product history. Use synthetic data for public demonstrations.
+
+## License
+
+Copyright © 2026 the Decision Echo authors. All rights reserved.
+
+This repository is published for review of a hackathon submission. No license is granted: you may view the code, but you may not copy, modify, distribute or use it without prior written permission.

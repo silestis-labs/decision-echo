@@ -11,7 +11,7 @@ The product checkout contains an ignored `internal/` checkout with its own `.git
 
 ## Commit and release checks
 
-Keep credentials out of both repositories. Review exact staged filenames/diffs and binary additions. Public assets need redistribution rights; incorporated reference code needs its required notices. No project license has been selected yet.
+Keep credentials out of both repositories. Review exact staged filenames/diffs and binary additions. Public assets need redistribution rights; incorporated reference code needs its required notices. No open-source license is granted: the authors reserve all rights (see the README's License section).
 
 The product repo excludes private source directories, internal notes, local agent configuration, generated recordings and credentials. `.gitignore` does not remove tracked files or old history. Before publication review the complete product history, tags, release assets and workflow artifacts. If credentials were ever committed, rotate them; deleting a file alone does not undo exposure.
 
