@@ -15,12 +15,12 @@ export const TaskSchema = z.object({
   decision: z.enum(['Schedule','Split','Request information','Escalate','Hold']), notionPageId: z.string().optional(),
 });
 export type Task = z.infer<typeof TaskSchema>;
-export const RuleKind = z.enum(['no_overlap','availability','customer_only','skill_match','dependency_ready','focus_block','review_buffer','blocked_followup']);
+export const RuleKind = z.enum(['no_overlap','availability','customer_only','skill_match','dependency_ready','focus_block','review_buffer','blocked_followup','client_work_window']);
 export const EvidenceSchema = z.object({ id: z.string(), sessionId: z.string(), epoch: z.number().int(), at: z.string(), kind: z.enum(['frame','answer','activity']), text: z.string(), image: z.string().optional() });
 export type Evidence = z.infer<typeof EvidenceSchema>;
-export const AnswerSchema = z.object({id:z.string().uuid(), stage:z.enum(['capture','debrief']), question:z.string().min(1).max(2000), answer:z.string().min(1).max(10000), evidenceIds:z.array(z.string()).min(1).max(100), ruleKinds:z.array(RuleKind).max(8), guardrail:z.boolean()});
+export const AnswerSchema = z.object({id:z.string().uuid(), stage:z.enum(['capture','debrief']), question:z.string().min(1).max(2000), answer:z.string().min(1).max(10000), evidenceIds:z.array(z.string()).min(1).max(100), ruleKinds:z.array(RuleKind).max(9), guardrail:z.boolean()});
 export type Answer = z.infer<typeof AnswerSchema>;
-export const RuleSchema = z.object({ id:z.string(), kind:RuleKind, title:z.string(), explanation:z.string(), evidenceIds:z.array(z.string()).min(1), expertQuote:z.string().min(1), parameters:z.object({ bufferMinutes:z.number().min(0).max(1440).optional() }).default({}) });
+export const RuleSchema = z.object({ id:z.string(), kind:RuleKind, title:z.string(), explanation:z.string(), evidenceIds:z.array(z.string()).min(1), expertQuote:z.string().min(1), parameters:z.object({ bufferMinutes:z.number().min(0).max(1440).optional(),person:z.enum(['Lea','Jonas','Mira']).optional(),startHour:z.number().int().min(0).max(23).optional(),endHour:z.number().int().min(1).max(23).optional() }).default({}) }).refine(rule=>rule.kind!=='client_work_window'||(rule.parameters.person!==undefined&&rule.parameters.startHour!==undefined&&rule.parameters.endHour!==undefined&&rule.parameters.startHour<rule.parameters.endHour),{message:'A client work window needs a reviewed person and increasing start/end hours.'});
 export type Rule = z.infer<typeof RuleSchema>;
 export const WorkMapSchema = z.object({id:z.string(),version:z.number().int().positive(),status:z.enum(['draft','confirmed']),rules:z.array(RuleSchema),teachBack:z.string(),confirmedAt:z.string().optional()});
 export type WorkMap = z.infer<typeof WorkMapSchema>;

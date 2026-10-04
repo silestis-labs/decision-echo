@@ -4,7 +4,7 @@ const at = (day:number,hour:number) => `2026-10-${String(day).padStart(2,'0')}T$
 const time = (value:string|null) => value ? Date.parse(value) : NaN;
 const hours = (start:string|null,end:string|null) => (time(end)-time(start))/3600000;
 const overlap = (a:string|null,b:string|null,c:string|null,d:string|null) => time(a)<time(d) && time(c)<time(b);
-const berlinClock=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hourCycle:'h23'});
+const berlinClock=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
 function morningStart(value:string|null){
   if(!Number.isFinite(time(value)))return false;
   const parts=berlinClock.formatToParts(new Date(value!));
@@ -33,6 +33,26 @@ export function sandboxTasks():Task[] {
     {...base,id:'atlas',customer:'Atlas',trainingStage:'Advanced Test',description:'Urgent data correction requiring replanning of the whole week.',dependency:'The release file is expected Wednesday at 16:00.',timeWindow:'Morning only',title:'Atlas Data Correction',effort:2,deadline:at(8,12),priority:0,customerPreference:'Lea only',dependencyAvailableAt:at(7,16),focus:false,assignee:'Unassigned',start:null,end:null,decision:'Hold'},
   ];
 }
+/** A held-out client case; the policy and its reason are absent from task data. */
+export function clientReportTask():Task {
+  const presentation=sandboxTasks().find(task=>task.id==='presentation')!;
+  return {...presentation,id:'client-report',title:'Client Report',customer:'Northstar',trainingStage:'Advanced Test',description:'Prepare a four-hour report for an external customer.',dependency:'All input is ready. Independent review is planned before delivery.',effort:4,deadline:at(9,12),priority:1,customerPreference:'Prefers Jonas',timeWindow:'Flexible',assignee:'Unassigned',start:null,end:null,reviewOwner:'Mira',reviewStart:at(9,9),reviewEnd:at(9,10),decision:'Hold'};
+}
+function expertWindow(answers:Session['answers']):Rule['parameters'] {
+  const text=answers[0]?.answer??'';
+  const people=[...new Set(text.match(/\b(?:Lea|Jonas|Mira)\b/g)??[])];
+  const person=(people.length===1?people[0]:undefined) as 'Lea'|'Jonas'|'Mira'|undefined;
+  const match=text.match(/\b([01]?\d|2[0-3]):00\s*(?:to|through|until|[-–])\s*([01]?\d|2[0-4]):00\b/i);
+  if(!person||!match||Number(match[1])>=Number(match[2]))throw new Error('State the client-work person and an explicit window, such as 13:00 to 17:00, before compiling.');
+  return {person,startHour:Number(match[1]),endHour:Number(match[2])};
+}
+function fitsExpertWindow(task:Task,startHour:number,endHour:number){
+  if(!Number.isFinite(time(task.start))||!Number.isFinite(time(task.end)))return false;
+  const parts=(date:string)=>Object.fromEntries(berlinClock.formatToParts(new Date(date)).map(part=>[part.type,part.value]));
+  const start=parts(task.start!),end=parts(task.end!);
+  const sameDay=start.year===end.year&&start.month===end.month&&start.day===end.day;
+  return sameDay&&Number(start.hour)*60+Number(start.minute)>=startHour*60&&Number(end.hour)*60+Number(end.minute)<=endHour*60;
+}
 export function createSandboxSession(id:string,mode:'sandbox'|'live'):Session {
   return {templateVersion:1,progress:{checks:0,blockedChecks:0,encounteredRuleIds:[],resolvedRuleIds:[]},id,mode,epoch:0,recording:false,phase:'capture',evidence:[],answers:[],map:null,tasks:sandboxTasks(),availability:sandboxAvailability(),validation:null,commitStatus:'idle',revision:0};
 }
@@ -58,6 +78,7 @@ const descriptions:Record<string,[string,string]> = {
   focus_block:['Preserve focus work','Keep focused tasks in a complete block.'],
   review_buffer:['Leave time for independent review','External deliverables need independent review before the deadline.'],
   blocked_followup:['Make blocked work actionable','Blocked work needs a follow-up owner and checkpoint, not a production slot.'],
+  client_work_window:['Respect client-work windows','External client work must fit the person’s expert-confirmed time window.'],
 };
 export function compileMap(session:Session):WorkMap {
   const capture=session.answers.filter(a=>a.stage==='capture');
@@ -69,7 +90,7 @@ export function compileMap(session:Session):WorkMap {
     const supporting=session.answers.filter(a=>a.ruleKinds.includes(kind));
     const evidenceIds=[...new Set(supporting.flatMap(a=>a.evidenceIds))];
     if(!evidenceIds.length || evidenceIds.some(id=>!known.has(id))) throw new Error('Each rule needs valid evidence from this session.');
-    return {id:`rule-${kind}`,kind,title:descriptions[kind][0],explanation:descriptions[kind][1],evidenceIds,expertQuote:supporting[0].answer,parameters:{}};
+    return {id:`rule-${kind}`,kind,title:descriptions[kind][0],explanation:descriptions[kind][1],evidenceIds,expertQuote:supporting[0].answer,parameters:kind==='client_work_window'?expertWindow(supporting):{}};
   });
   if(!rules.length) throw new Error('The expert must associate at least one rule with their answers.');
   return WorkMapSchema.parse({id:`map-${session.id}`,version:(session.map?.version??0)+1,status:'draft',rules,teachBack:rules.map(r=>`${r.title}: ${r.expertQuote}`).join('\n\n')});
@@ -92,8 +113,8 @@ export function validatePlan(tasks:Task[],availability:Availability[],map:WorkMa
   if(new Set(tasks.map(t=>t.id)).size!==tasks.length) add('system',[],'Duplicate task IDs are not allowed.');
   if(options.requireUrgentResolution){
     for(const task of tasks){
-      if(task.priority!==0||task.dependencyStatus!=='Ready')continue;
-      if(task.decision==='Hold'||task.decision==='Request information') add('system',[task.id],'Ready urgent work must be scheduled or explicitly escalated; holding it does not complete this case.');
+      if((task.priority!==0&&task.id!=='client-report')||task.dependencyStatus!=='Ready')continue;
+      if(task.decision==='Hold'||task.decision==='Request information') add('system',[task.id],task.id==='client-report'?'The client report must be scheduled or explicitly escalated; holding it does not complete this case.':'Ready urgent work must be scheduled or explicitly escalated; holding it does not complete this case.');
       if(task.decision==='Escalate'&&(!task.followUpOwner.trim()||!Number.isFinite(time(task.followUpCheckpoint))||time(task.followUpCheckpoint)>time(task.deadline))) add('system',[task.id],'An urgent escalation needs an accountable owner and a checkpoint by the deadline.');
     }
   }
@@ -112,6 +133,7 @@ export function validatePlan(tasks:Task[],availability:Availability[],map:WorkMa
   for(const rule of map.rules){
     for(const task of tasks){
       const scheduled=assigned.includes(task);
+      if(rule.kind==='client_work_window'&&scheduled&&task.external&&task.assignee===rule.parameters.person&&!fitsExpertWindow(task,rule.parameters.startHour!,rule.parameters.endHour!))add(rule.id,[task.id],`${task.assignee}'s external client work must fit ${rule.parameters.startHour}:00–${rule.parameters.endHour}:00 in Europe/Berlin, as confirmed by the expert.`);
       if(rule.kind==='availability' && scheduled && !availability.some(a=>a.person===task.assignee&&time(task.start)>=time(a.start)&&time(task.end)<=time(a.end))) add(rule.id,[task.id],`${task.title} falls outside ${task.assignee}'s availability.`);
       if(rule.kind==='skill_match' && scheduled && !availability.some(a=>a.person===task.assignee&&a.skill.includes(task.skill))) add(rule.id,[task.id],`${task.assignee} does not have the required ${task.skill} skill.`);
       if(rule.kind==='customer_only' && scheduled && task.customerPreference.endsWith(' only') && task.assignee!==task.customerPreference.slice(0,-5)) add(rule.id,[task.id],`${task.customerPreference} is a required assignment.`);
