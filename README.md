@@ -61,11 +61,9 @@ Start with the [hosted demo](https://decision-echo.litchis-sixty-1m.workers.dev)
 | Correct | Fix the complete plan, check again and explicitly approve the sandbox save. | Passing a check does not save automatically. The result and practice counters reflect observed work. |
 | Export | Open the skill library and download the reviewed skill. | Instructions include evidence references without session access tokens. |
 
-### The decisive moment: urgent work displaces existing work
+### The decisive moment: a free slot the expert would never use
 
-The expert has scheduled **Analyze Cohort Data** for Lea on Thursday, 8 October 2026, **09:00–13:00**. The learner receives **Atlas Data Correction**, a previously hidden two-hour urgent task requiring Lea before noon.
-
-Scheduling Atlas **09:00–11:00** looks sensible in isolation, but double-books Lea. With the expert's no-overlap rule confirmed, the controlled check catches the conflict and presents the expert's reasoning. The learner moves the entire cohort block to Friday **08:00–12:00**, checks the whole plan again, and can then explicitly save a compliant proposal. All names and tasks are synthetic; times use Europe/Berlin.
+During Capture the expert explains a rule that no calendar shows: Jonas does external client work only from 13:00 to 17:00, because he covers the support hotline every morning. In Teach the learner receives the previously hidden **Client Report** and books Jonas on Thursday **08:00–12:00**. The slot looks free and passes availability, effort, deadline and review checks, but the confirmed client-work rule blocks the save and the tutor explains it in the expert's words. Moving the report to **13:00–17:00** passes, and only then can the plan be saved.
 
 ### A changed expert rule must change the result
 
@@ -97,7 +95,7 @@ Speech provides reasoning, but a transcript-derived expert answer becomes rule e
 | When does it ask? | Capture question timing, activity signals and the explicit pause/reading control. |
 | What does it ask? | Saved screen-specific questions about reasons, exceptions and guardrails. |
 | When has it understood? | The new debrief answers, teach-back and expert confirmation of the map version. |
-| Did the learner learn? | The unseen Atlas decision, evidence-backed intervention, correction and observed practice summary. |
+| Did the learner learn? | The unseen Client Report decision, evidence-backed intervention, correction and observed practice summary. |
 | Can the expert trust it? | Original source inspection, off-record behavior and the controlled approval/save boundary. |
 
 These are inspection points, not claims that a single passing case proves proficiency. The [requirements](docs/requirements.md) provide the full acceptance contract; the [release report](docs/reviews/release-verification-2026-10-04.md) records what actually ran.
