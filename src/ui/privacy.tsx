@@ -19,6 +19,6 @@ export function PrivacyNotice({source=notice}:{source?:string}){
   return <p key={index}>{inline(block.replace(/\n/g,' '))}</p>;
  })}</article>;
 }
-export function PrivacyFooter(){return <footer role="contentinfo" className="privacy-footer" aria-label="Privacy information"><span>Decision Echo</span><a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</a></footer>;}
+export function PrivacyFooter(){return <footer role="contentinfo" className="privacy-footer" aria-label="Privacy information"><a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</a></footer>;}
 export function PrivacyPage(){return <><main className="privacy-page"><a href="/">Back to Decision Echo</a><PrivacyNotice/></main><PrivacyFooter/></>;}
 export function isPrivacyRoute(pathname:string){return /^\/privacy\/?$/.test(pathname);}
