@@ -1,6 +1,6 @@
 # Customer journey and product surfaces
 
-Status: concrete product recommendation for plan review, 2026-10-04; not implemented or runtime-verified. The user confirmed Eleven v4 Turbo as the voice-model choice. Browser-first access and the optional installation model below are recommendations to settle before implementation, not previously confirmed user decisions.
+Status: historical full-product journey proposal, 2026-10-04. The controlled web sandbox is now implemented and live-provider tested; see [current runtime evidence](reviews/live-web-validation-2026-10-04.md). Team accounts, generalized adapters and some surfaces below remain proposals. The user confirmed Eleven v4 Turbo as the voice-model choice. Browser-first access and the optional installation model below are recommendations to settle before implementation, not previously confirmed user decisions.
 
 ## Assignment fit
 

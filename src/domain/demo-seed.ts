@@ -11,8 +11,8 @@ const csv = (rows: unknown[][]) => rows.map(row => row.map(cell).join(',')).join
 export function notionTasksCsv(tasks: Task[]) {
   const flags = (t: Task) => [t.focus ? 'Focus Work' : '', t.external ? 'Review Required' : ''].filter(Boolean).join(',');
   return csv([
-    ['Task', 'Required Skill', 'Effort (h)', 'Deadline', 'Priority', 'Customer Preference', 'Dependency Status', 'Dependency Available At', 'Flags', 'Proposed Assignee', 'Start', 'End', 'Review Owner', 'Review Start', 'Review End', 'Follow-up Owner', 'Follow-up Checkpoint', 'Decision'],
-    ...tasks.map(t => [t.title, t.skill, t.effort, notionDate(t.deadline), `P${t.priority}`, t.customerPreference, t.dependencyStatus, notionDate(t.dependencyAvailableAt), flags(t), t.assignee, notionDate(t.start), notionDate(t.end), t.reviewOwner, notionDate(t.reviewStart), notionDate(t.reviewEnd), t.followUpOwner, notionDate(t.followUpCheckpoint), t.decision]),
+    ['Task', 'Customer', 'Description', 'Training Stage', 'Time Window', 'Planning Week', 'Dependency', 'Review Status', 'Required Skill', 'Effort (h)', 'Deadline', 'Priority', 'Customer Preference', 'Dependency Status', 'Dependency Available At', 'Flags', 'Proposed Assignee', 'Start', 'End', 'Review Owner', 'Review Start', 'Review End', 'Follow-up Owner', 'Follow-up Checkpoint', 'Decision'],
+    ...tasks.map(t => [t.title, t.customer, t.description, t.trainingStage, t.timeWindow, t.planningWeek, t.dependency, t.reviewStatus, t.skill, t.effort, notionDate(t.deadline), `P${t.priority}`, t.customerPreference, t.dependencyStatus, notionDate(t.dependencyAvailableAt), flags(t), t.assignee, notionDate(t.start), notionDate(t.end), t.reviewOwner, notionDate(t.reviewStart), notionDate(t.reviewEnd), t.followUpOwner, notionDate(t.followUpCheckpoint), t.decision]),
   ]);
 }
 

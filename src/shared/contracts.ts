@@ -3,6 +3,9 @@ import { z } from 'zod';
 export const Person = z.enum(['Lea', 'Jonas', 'Mira', 'Unassigned']);
 export const TaskSchema = z.object({
   id: z.string(), title: z.string().min(1), skill: z.string(), effort: z.number().positive(),
+  customer:z.string().default(''), description:z.string().default(''), dependency:z.string().default(''),
+  trainingStage:z.string().default(''), timeWindow:z.string().default(''), planningWeek:z.string().default(''),
+  reviewStatus:z.enum(['Not set','Not required','Planned','Approved','Changes requested']).default('Not set'),
   deadline: z.string().datetime({ offset: true }), priority: z.number().int().min(0).max(3),
   customerPreference: z.string(), dependencyStatus: z.enum(['Ready','Waiting','Blocked']),
   dependencyAvailableAt: z.string().datetime({ offset: true }).nullable(), focus: z.boolean(), external: z.boolean(),
@@ -27,7 +30,7 @@ export const VisualCoachModelSchema = z.object({summary:z.string().max(1200),con
 export type VisualCoach = {frameId:string;at:string;mapVersion:number;summary:string;concerns:{ruleId:string;visibleBasis:string;message:string;expertQuote:string;evidenceIds:string[]}[];nextQuestion:string;uncertain:boolean};
 export type Availability = { person:z.infer<typeof Person>; skill:string[]; start:string; end:string };
 export type LearningProgress = { checks:number; blockedChecks:number; encounteredRuleIds:string[]; resolvedRuleIds:string[] };
-export type Session = { progress?:LearningProgress; id:string; epoch:number; recording:boolean; phase:'capture'|'map'|'teach'; mode:'sandbox'|'live'; evidence:Evidence[]; answers:Answer[]; map:WorkMap|null; tasks:Task[]; availability:Availability[]; validation:Validation|null; commitStatus:'idle'|'writing'|'complete'|'partial'|'unknown'; revision:number };
+export type Session = { progress?:LearningProgress; templateVersion?:number; id:string; epoch:number; recording:boolean; phase:'capture'|'map'|'teach'; mode:'sandbox'|'live'; evidence:Evidence[]; answers:Answer[]; map:WorkMap|null; tasks:Task[]; availability:Availability[]; validation:Validation|null; commitStatus:'idle'|'writing'|'complete'|'partial'|'unknown'; revision:number };
 export type Capabilities = { elevenLabs:boolean; openAI:boolean; notion:boolean; mode:'sandbox'|'live'; model:string; voiceModel:string; accessCodeRequired:boolean };
 
 // Bearer session capability is returned once at creation and retained in tab-scoped sessionStorage by the browser; server stores only a digest.

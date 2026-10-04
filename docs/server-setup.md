@@ -80,3 +80,11 @@ Signed voice URL requests require active recording. The server rechecks recordin
 Authenticated `POST /api/sessions/:id/delete {confirmed:true}` erases session state, frames, held-out records and journals and invalidates its capability. Recording must be stopped first. Writing, partial and unknown commits block deletion so reconciliation evidence is preserved. Deleting a session does not undo Notion writes or remove provider-side conversation records. Forgetting tab access alone does not delete server evidence.
 
 Repeated identical activity categories are coalesced within two seconds to avoid a typing burst exhausting retained evidence. Questions are bounded to 2,000 characters and answers to 10,000; the 1,000-entry evidence limit applies to captured activity, frames and saved answers. Image retention remains bounded separately.
+
+## Current web demo configuration and deployment gate — 2026-10-04
+
+The tested web journey uses `MODE=sandbox` with real ElevenLabs and OpenAI credentials. “Sandbox” describes synthetic planning data and local plan persistence, not fake providers. Notion credentials are unnecessary for this journey. The real-provider and actual Chrome evidence is recorded in [live validation](reviews/live-web-validation-2026-10-04.md); older unverified-provider statements above describe the earlier implementation stage. Human microphone ASR and Notion writes remain unverified.
+
+For public hosting, set the exact deployed `APP_ORIGIN` and a server-side `DEMO_ACCESS_CODE`. Without a code, non-local or malformed origins reject new session creation. Code checks also apply to requests without an Origin header; CORS alone is not authentication. The code is kept in browser memory and sent only to create a session capability. It does not grant account identities, quotas or cross-device recovery. A production service still needs authenticated ingress, rate limits and an evidence retention policy.
+
+Browser API requests time out after 35 seconds and are never automatically retried. If a mutation times out, reload its session to inspect server state before retrying. Exported companion connections use the current web origin, including the local Vite proxy, rather than a hardcoded development API URL.

@@ -1,13 +1,37 @@
 import { chromium, expect } from '@playwright/test';
 import assert from 'node:assert/strict';
+import { isolatedWorker } from './isolated-worker.mjs';
+const worker=await isolatedWorker();
 const browser=await chromium.launch({headless:true});
 try{
 const page=await browser.newPage({viewport:{width:1440,height:1000},timezoneId:'Europe/Berlin'});
 const errors=[];page.on('pageerror',error=>errors.push(error.message));
+await page.route('**/api/**',route=>route.continue({url:worker.base+new URL(route.request().url()).pathname}));
 // Test-only synthetic canvas replaces OS permission/capture. This does not prove hardware capture.
 await page.addInitScript(()=>{navigator.mediaDevices.getDisplayMedia=async()=>{const c=document.createElement('canvas');c.width=800;c.height=450;const ctx=c.getContext('2d');ctx.fillStyle='#f5f6fa';ctx.fillRect(0,0,800,450);ctx.fillStyle='#12213b';ctx.font='24px sans-serif';ctx.fillText('Synthetic browser integration test screen',30,50);let tick=0;setInterval(()=>{ctx.fillStyle=tick%2?'#cc8844':'#4466aa';ctx.fillRect(700,350,50,50);ctx.fillStyle='#f5f6fa';ctx.fillRect(600,400,90,40);ctx.fillStyle='#12213b';ctx.fillText(String(tick++),610,430);},1000);const stream=c.captureStream(2);if(window.__deferCapture)await new Promise(resolve=>{window.__releaseCapture=resolve;});return stream;};});
 await page.goto('http://127.0.0.1:5173');
 await page.getByRole('button',{name:'Start sandbox session →',exact:true}).click();
+// Planner navigation and draft edits must not persist schedule changes.
+await expect(page.getByRole('heading',{name:'LIVE · Task Planning',exact:true})).toBeVisible();
+await expect(page.getByText('Atlas Data Correction',{exact:true})).toHaveCount(0);
+const draftRef=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0]);
+const originalDraft=await (await page.request.get(`${worker.base}/api/sessions/${draftRef.id}`,{headers:{Authorization:`Bearer ${draftRef.token}`}})).json();
+await page.getByLabel('Finalize Client Presentation assignee',{exact:true}).selectOption('Lea');
+const serverDraft=await (await page.request.get(`${worker.base}/api/sessions/${draftRef.id}`,{headers:{Authorization:`Bearer ${draftRef.token}`}})).json();
+assert.deepEqual(serverDraft.tasks,originalDraft.tasks,'Local planner edits must not autosave to the server');
+await page.getByLabel('Finalize Client Presentation assignee',{exact:true}).selectOption('Jonas');
+await page.locator('.np-view-tabs').getByRole('button',{name:'▦ Calendar',exact:true}).click();
+await expect(page.locator('.np-view-heading')).toContainText('October 2026');
+await page.getByRole('button',{name:'Next month',exact:true}).click();
+await expect(page.locator('.np-view-heading')).toContainText('November 2026');
+await page.getByRole('button',{name:'Previous month',exact:true}).click();
+await page.getByRole('button',{name:'☰ Timeline',exact:true}).click();
+await page.getByRole('button',{name:'Finalize Client Presentation',exact:true}).click();
+await expect(page.getByRole('button',{name:'Close task details',exact:true})).toBeFocused();
+await page.keyboard.press('Escape');
+await expect(page.getByRole('button',{name:'Finalize Client Presentation',exact:true})).toBeFocused();
+await page.getByRole('button',{name:'▦ Table',exact:true}).click();
+
 const simulation=page.getByRole('checkbox',{name:'Synthetic simulation — mute microphone and send typed test replies',exact:true});
 await expect(simulation).not.toBeChecked();
 await simulation.check();
@@ -38,7 +62,7 @@ await expect(page.getByRole('button',{name:'Share screen',exact:true})).toBeEnab
 await expect(page.getByText('Screen sharing stopped',{exact:true})).toBeVisible();
 await page.unroute('**/api/sessions/*/recording');
 const racedRef=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0]);
-const racedState=await (await page.request.get(`http://127.0.0.1:8787/api/sessions/${racedRef.id}`,{headers:{Authorization:`Bearer ${racedRef.token}`}})).json();
+const racedState=await (await page.request.get(`${worker.base}/api/sessions/${racedRef.id}`,{headers:{Authorization:`Bearer ${racedRef.token}`}})).json();
 assert.equal(racedState.recording,false,'late capture activation must be compensated after pause');
 await page.getByRole('button',{name:'Share screen',exact:true}).click();
 await page.getByRole('button',{name:'Screen moment',exact:false}).first().waitFor({timeout:12000});
@@ -84,9 +108,8 @@ await page.getByRole('button',{name:'Rebuild draft from all answers',exact:true}
 await page.getByRole('button',{name:'I confirm this is how I work',exact:true}).click();
 await page.getByRole('button',{name:'Open unseen learner case →',exact:true}).click();
 await expect(page.getByRole('heading',{name:'Weekly plan · unsaved proposal',exact:true})).toBeVisible();
-const atlas=page.getByRole('row').filter({hasText:'Atlas Data Correction'});
-await atlas.locator('select').nth(0).selectOption('Schedule');
-await atlas.locator('select').nth(1).selectOption('Lea');
+await page.getByLabel('Atlas Data Correction decision',{exact:true}).selectOption('Schedule');
+await page.getByLabel('Atlas Data Correction assignee',{exact:true}).selectOption('Lea');
 await page.getByLabel('Atlas Data Correction start',{exact:true}).fill('0010-10-08T09:00');
 await page.getByLabel('Atlas Data Correction end',{exact:true}).fill('2026-10-08T11:00');
 await page.getByRole('button',{name:'Check with the learned rules',exact:true}).click();
@@ -108,7 +131,7 @@ await page.screenshot({path:'/private/tmp/decision-echo-browser-review.png',full
 // Mocked vision-provider UI contract test: this does not prove real model screen understanding.
 await expect(page.getByText('Visual coaching is not configured.',{exact:false})).toBeVisible();
 const coachRef=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0]);
-const coachSession=await (await page.request.get(`http://127.0.0.1:8787/api/sessions/${coachRef.id}`,{headers:{Authorization:`Bearer ${coachRef.token}`}})).json();
+const coachSession=await (await page.request.get(`${worker.base}/api/sessions/${coachRef.id}`,{headers:{Authorization:`Bearer ${coachRef.token}`}})).json();
 const expertRule=coachSession.map.rules[0];
 await page.route('**/api/config',async route=>{const actual=await route.fetch();await route.fulfill({json:{...await actual.json(),openAI:true}});});
 const mockCoach=frameId=>({frameId,at:new Date().toISOString(),mapVersion:coachSession.map.version,summary:'Synthetic mocked vision observation',concerns:[{ruleId:expertRule.id,visibleBasis:'Synthetic provider fixture; no live image interpretation was performed.',message:'Review this expert rule before continuing.',expertQuote:expertRule.expertQuote,evidenceIds:expertRule.evidenceIds}],nextQuestion:'Which expert rule should guide this visible choice?',uncertain:true});
@@ -148,24 +171,24 @@ await page.getByText('Optional capture companions',{exact:true}).click();
 await page.getByRole('button',{name:'Start companion capture',exact:true}).click();
 const ref=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0]);
 const companionHeaders={'Authorization':`Bearer ${ref.token}`,'Content-Type':'application/json'};
-const companionSession=await (await page.request.get(`http://127.0.0.1:8787/api/sessions/${ref.id}`,{headers:companionHeaders})).json();
-const evidenceResponse=await page.request.post(`http://127.0.0.1:8787/api/sessions/${ref.id}/evidence`,{headers:companionHeaders,data:{epoch:companionSession.epoch,kind:'frame',text:'Synthetic external companion frame',image:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jP1sAAAAASUVORK5CYII='}});
+const companionSession=await (await page.request.get(`${worker.base}/api/sessions/${ref.id}`,{headers:companionHeaders})).json();
+const evidenceResponse=await page.request.post(`${worker.base}/api/sessions/${ref.id}/evidence`,{headers:companionHeaders,data:{epoch:companionSession.epoch,kind:'frame',text:'Synthetic external companion frame',image:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jP1sAAAAASUVORK5CYII='}});
 assert.equal(evidenceResponse.status(),200);
 await expect(page.getByRole('button',{name:/Screen moment.*Synthetic external companion frame/})).toBeVisible({timeout:10000});
 const heartbeat=await page.waitForResponse(response=>response.url().endsWith('/heartbeat')&&response.status()===200,{timeout:18000});
 assert((await heartbeat.json()).expiresAt>Date.now());
 await page.getByRole('button',{name:'◼ Off the record',exact:true}).click();
 await expect(page.getByRole('status')).toHaveText('Off the record. Screen and microphone stopped. Resume requires fresh permission.');
-const stale=await page.request.post(`http://127.0.0.1:8787/api/sessions/${ref.id}/evidence`,{headers:companionHeaders,data:{epoch:companionSession.epoch,kind:'activity',text:'Stale companion event'}});
+const stale=await page.request.post(`${worker.base}/api/sessions/${ref.id}/evidence`,{headers:companionHeaders,data:{epoch:companionSession.epoch,kind:'activity',text:'Stale companion event'}});
 assert.equal(stale.status(),409);
 await page.getByRole('button',{name:'04 Skill library',exact:true}).click();
 const priorRef=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1')).find(r=>r.confirmed));
 const priorHeaders={Authorization:`Bearer ${priorRef.token}`,'Content-Type':'application/json'};
-const priorState=await (await page.request.get(`http://127.0.0.1:8787/api/sessions/${priorRef.id}`,{headers:priorHeaders})).json();
-await page.request.post(`http://127.0.0.1:8787/api/sessions/${priorRef.id}/recording`,{headers:priorHeaders,data:{recording:true,epoch:priorState.epoch}});
+const priorState=await (await page.request.get(`${worker.base}/api/sessions/${priorRef.id}`,{headers:priorHeaders})).json();
+await page.request.post(`${worker.base}/api/sessions/${priorRef.id}/recording`,{headers:priorHeaders,data:{recording:true,epoch:priorState.epoch}});
 await page.getByRole('button',{name:'Open saved skill',exact:true}).click();
 await expect(page.getByRole('status')).toHaveText('Opened saved session. Sensors are off.');
-const reopened=await (await page.request.get(`http://127.0.0.1:8787/api/sessions/${priorRef.id}`,{headers:priorHeaders})).json();
+const reopened=await (await page.request.get(`${worker.base}/api/sessions/${priorRef.id}`,{headers:priorHeaders})).json();
 assert.equal(reopened.recording,false,'reopening must pause another collector’s active session');
 await expect(page.getByRole('button',{name:'Download reviewed SKILL.md ↓'})).toBeEnabled();
 const deleteRef=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1'))[0]);
@@ -175,7 +198,7 @@ await expect(page.getByRole('button',{name:'Download reviewed SKILL.md ↓'})).t
 page.once('dialog',dialog=>dialog.accept());
 await page.getByRole('button',{name:'Permanently delete current session',exact:true}).click();
 await expect(page.getByRole('status')).toContainText('Session and server evidence erased');
-const deletedResponse=await page.request.get(`http://127.0.0.1:8787/api/sessions/${deleteRef.id}`,{headers:{Authorization:`Bearer ${deleteRef.token}`}});
+const deletedResponse=await page.request.get(`${worker.base}/api/sessions/${deleteRef.id}`,{headers:{Authorization:`Bearer ${deleteRef.token}`}});
 assert.equal(deletedResponse.status(),404);
 assert.equal(await page.evaluate(id=>JSON.parse(sessionStorage.getItem('decision-echo.sessions.v1')).some(r=>r.id===id),deleteRef.id),false);
 await page.getByRole('button',{name:'Forget this tab’s sessions',exact:true}).click();
@@ -183,4 +206,4 @@ await expect(page.getByRole('button',{name:'Start sandbox session →',exact:tru
 assert.equal(await page.evaluate(()=>sessionStorage.getItem('decision-echo.sessions.v1')),null);
 assert.equal(errors.length,0,errors.join('\n'));
 console.log('PASS browser capture (synthetic stream), active/paused reload recovery, capture/debrief, confirmed map, unseen learner intervention and correction, sandbox save, skill download, multi-session tab library, capability removal, mocked visual coach success/failure/evidence replay/privacy.');
-}finally{await browser.close();}
+}finally{await browser.close();await worker.close();}

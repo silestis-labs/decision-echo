@@ -26,15 +26,19 @@ Without an OpenAI key, the sandbox compiles actual entered answers into selected
 
 ## Connect live providers
 
-Copy `.dev.vars.example` to ignored `.dev.vars` and configure credentials locally. Browser login alone does not connect the application. Configure separate ElevenLabs expert/tutor agents with the selected v4 Turbo voice model, OpenAI backend access, and a Notion connection to the demo data source. Set `MODE=live` and `APP_ORIGIN` in runtime configuration; see [server setup](docs/server-setup.md) for availability and schema configuration. Never expose API keys in the browser or commit them.
+Copy `.dev.vars.example` to ignored `.dev.vars` and configure credentials locally. Browser login alone does not connect the application. For the current self-contained demo, keep `MODE=sandbox`: that selects synthetic planning data while real ElevenLabs and OpenAI providers remain active when configured. Notion credentials are optional and are only needed for the separate Notion adapter mode.
 
-Real ElevenLabs expert/tutor exchanges and Chrome window capture have been exercised with labeled synthetic narration. OpenAI vision and Notion writes remain **unverified until credentials are configured and those tests run**. This is a working local foundation, not a completed full-suite or hackathon-compliance claim.
+Configure `ELEVENLABS_API_KEY`, separate expert/tutor agent IDs and `OPENAI_API_KEY`; use an account-accessible `OPENAI_MODEL` (the verified local configuration uses `gpt-6.1-sol`). Configure the selected v4 Turbo voice on both ElevenLabs agents. See [server setup](docs/server-setup.md). Keep keys server-side and out of Git.
 
 ## Verified and pending
 
-Verified locally: TypeScript, deterministic scheduling and provider-safety tests, actual local Durable Object API integration, and the browser Capture → Map → Teach → blocked proposal → correction → explicit sandbox save journey. Browser automation uses a synthetic test stream; it does not verify OS screen-sharing permissions or hardware capture. Reload recovery, a tab-local confirmed-skill catalog, urgent-case completion, privacy leases and companion evidence polling are implemented. Extension privacy tests and isolated unpacked Chromium runtime checks pass. The native companion has a reproducible local app bundle; see its dedicated guide for the latest platform checks.
+The [live web validation report](docs/reviews/live-web-validation-2026-10-04.md) records an actual Chrome screen-share run with real OpenAI observation/compilation, both ElevenLabs agents, six explicitly synthetic typed answers, confirmed map, a blocked learner mistake, correction, explicit local save and downloaded skill. A real microphone transcript was not tested in that run. Model output remains advisory until reviewed; supported scheduling operators, rather than arbitrary prose, drive controlled validation.
 
-Pending: OpenAI/Notion integration, native hardware capture and toolbar-granted extension screenshots, multilingual tutoring, multiple-expert comparison, generalized task/person schemas, reconciliation UI, user/team authentication and deployment. Technical pre-save enforcement applies to our controlled write path; direct Notion autosave is outside it.
+Local automated checks cover TypeScript, source constraints, learned scheduling rules, provider safety, isolated Durable Object APIs, recovery, stale revisions, capture leases, browser workflow, off-record behavior and skill export. Each report distinguishes mock media/provider fixtures from actual provider calls. Optional capture clients have separate [platform verification](docs/capture-clients.md).
+
+Still pending for a production team service: authenticated accounts and cross-device skill synchronization, production deployment and rate limits, real human microphone end-to-end verification, generalized task/person schemas and broader browser/OS coverage. Native macOS capture permission remains a separate platform gate. Real Notion writes remain unverified and are not required for this sandbox demo. Our controlled planner has an explicit save gate; direct Notion autosave remains outside it.
+
+Public deployments require `DEMO_ACCESS_CODE` before new sessions can be created. This is a shared demo gate, not per-user authentication. The server fails closed for a non-local `APP_ORIGIN` without that secret. Set the exact deployed origin and configure secrets before opening the demo to others.
 
 ## Checks
 
@@ -42,9 +46,10 @@ Pending: OpenAI/Notion integration, native hardware capture and toolbar-granted 
 npm run check
 npm run test:extension
 npm run test:extension:runtime
-# With both local servers running:
-node tests/api.integration.mjs
-node tests/browser.integration.mjs
+# Isolated tests (no provider credentials or shared database):
+npm run test:api
+npm run test:browser
+# With the local API running:
 npm run test:lease
 ```
 

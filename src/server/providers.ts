@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { TaskSchema,WorkMapSchema,RuleKind,VisualCoachModelSchema,type Task,type Session,type WorkMap,type Availability,type VisualCoach } from '../shared/contracts';
-import { ApiError,providerFetch } from './safety';
+import { ApiError,providerFetch,requiresDemoAccess } from './safety';
 export type Secrets={OPENAI_API_KEY?:string;ELEVENLABS_API_KEY?:string;ELEVENLABS_EXPERT_AGENT_ID?:string;ELEVENLABS_TUTOR_AGENT_ID?:string;NOTION_TOKEN?:string;NOTION_DATA_SOURCE_ID?:string;NOTION_AVAILABILITY_JSON?:string;NOTION_PROPERTY_MAP?:string;DEMO_ACCESS_CODE?:string};
 export type ServerEnv=Omit<Env,'MODE'>&{MODE:string}&Secrets&{EXTENSION_ORIGIN?:string};
-export function capabilities(env:ServerEnv){return {elevenLabs:Boolean(env.ELEVENLABS_API_KEY&&env.ELEVENLABS_EXPERT_AGENT_ID&&env.ELEVENLABS_TUTOR_AGENT_ID),openAI:Boolean(env.OPENAI_API_KEY),notion:Boolean(env.NOTION_TOKEN&&env.NOTION_DATA_SOURCE_ID&&env.NOTION_AVAILABILITY_JSON),mode:env.MODE==='live'?'live' as const:'sandbox' as const,model:env.OPENAI_MODEL,voiceModel:env.ELEVENLABS_VOICE_MODEL,accessCodeRequired:Boolean(env.DEMO_ACCESS_CODE)}}
+export function capabilities(env:ServerEnv,requestOrigin:string=env.APP_ORIGIN){return {elevenLabs:Boolean(env.ELEVENLABS_API_KEY&&env.ELEVENLABS_EXPERT_AGENT_ID&&env.ELEVENLABS_TUTOR_AGENT_ID),openAI:Boolean(env.OPENAI_API_KEY),notion:Boolean(env.NOTION_TOKEN&&env.NOTION_DATA_SOURCE_ID&&env.NOTION_AVAILABILITY_JSON),mode:env.MODE==='live'?'live' as const:'sandbox' as const,model:env.OPENAI_MODEL,voiceModel:env.ELEVENLABS_VOICE_MODEL,accessCodeRequired:requiresDemoAccess(env.APP_ORIGIN,env.DEMO_ACCESS_CODE,requestOrigin)}}
 export async function voiceUrl(env:ServerEnv,role:'expert'|'tutor'){
  const agent=role==='expert'?env.ELEVENLABS_EXPERT_AGENT_ID:env.ELEVENLABS_TUTOR_AGENT_ID;
  if(!env.ELEVENLABS_API_KEY||!agent)throw new ApiError(503,'Configure ElevenLabs key and role agent ID');
@@ -48,16 +48,18 @@ export async function liveCompile(env:ServerEnv,session:Session):Promise<WorkMap
  const parsed=WorkMapSchema.safeParse(value);if(!parsed.success)throw new ApiError(502,'Expert map returned invalid fields: '+parsed.error.issues.map(issue=>issue.path.join('.')).slice(0,8).join(', '));
  const map=parsed.data;map.status='draft';map.id=`map-${session.id}`;map.version=(session.map?.version||0)+1;delete map.confirmedAt;return map;
 }
-const defaults:Record<string,string>={title:'Task',skill:'Required Skill',effort:'Effort (h)',deadline:'Deadline',priority:'Priority',customerPreference:'Customer Preference',dependencyStatus:'Dependency Status',dependencyAvailableAt:'Dependency Available At',focus:'Flags',external:'Flags',assignee:'Proposed Assignee',start:'Start',end:'End',reviewOwner:'Review Owner',reviewStart:'Review Start',reviewEnd:'Review End',followUpOwner:'Follow-up Owner',followUpCheckpoint:'Follow-up Checkpoint',decision:'Decision'};
+const metadataFields=new Set(['customer','description','dependency','trainingStage','timeWindow','planningWeek','reviewStatus']);
+const defaults:Record<string,string>={customer:'Customer',description:'Description',dependency:'Dependency',trainingStage:'Training Stage',timeWindow:'Time Window',planningWeek:'Planning Week',reviewStatus:'Review Status',title:'Task',skill:'Required Skill',effort:'Effort (h)',deadline:'Deadline',priority:'Priority',customerPreference:'Customer Preference',dependencyStatus:'Dependency Status',dependencyAvailableAt:'Dependency Available At',focus:'Flags',external:'Flags',assignee:'Proposed Assignee',start:'Start',end:'End',reviewOwner:'Review Owner',reviewStart:'Review Start',reviewEnd:'Review End',followUpOwner:'Follow-up Owner',followUpCheckpoint:'Follow-up Checkpoint',decision:'Decision'};
 function propertyMap(env:ServerEnv){return {...defaults,...(env.NOTION_PROPERTY_MAP?z.record(z.string(),z.string()).parse(JSON.parse(env.NOTION_PROPERTY_MAP)): {})}}
 type Property={multi_select?:{name:string}[];type?:string;title?:{plain_text?:string;text?:{content:string}}[];rich_text?:{plain_text?:string;text?:{content:string}}[];number?:number|null;checkbox?:boolean;select?:{name:string}|null;status?:{name:string}|null;date?:{start:string;end?:string}|null};
 type Page={id:string;last_edited_time:string;properties:Record<string,Property>};
 export function mapNotionPage(page:Page,names=defaults):Task{
  const raw:Record<string,unknown>={id:page.id,notionPageId:page.id};
- for(const [field,name] of Object.entries(names)){const p=page.properties[name];if(!p)throw new ApiError(422,`Notion is missing property ${name}`);raw[field]=p.title||p.rich_text?(p.title||p.rich_text||[]).map(x=>x.plain_text??x.text?.content??'').join(''):p.type==='number'?p.number:p.type==='checkbox'?p.checkbox:p.select?.name??p.status?.name??p.date?.start??null;}
+ for(const [field,name] of Object.entries(names)){const p=page.properties[name];if(!p){if(metadataFields.has(field))continue;throw new ApiError(422,`Notion is missing property ${name}`);}raw[field]=p.title||p.rich_text?(p.title||p.rich_text||[]).map(x=>x.plain_text??x.text?.content??'').join(''):p.type==='number'?p.number:p.type==='checkbox'?p.checkbox:p.select?.name??p.status?.name??p.date?.start??null;}
  raw.priority=typeof raw.priority==='string'?Number(/^P([0-3])/.exec(raw.priority)?.[1]):raw.priority;
  raw.focus=(page.properties[names.focus]?.multi_select||[]).some(x=>x.name==='Focus Work');raw.external=(page.properties[names.external]?.multi_select||[]).some(x=>x.name==='Review Required');
- for(const field of ['customerPreference','followUpOwner'])if(raw[field]===null)raw[field]='';
+ for(const field of ['customerPreference','followUpOwner','customer','description','dependency','trainingStage','timeWindow','planningWeek'])if(raw[field]===null)raw[field]='';
+ if(raw.reviewStatus===null)raw.reviewStatus='Not set';
  return TaskSchema.parse(raw);
 }
 async function notion(env:ServerEnv,path:string,method='GET',body?:unknown){
@@ -68,7 +70,8 @@ export async function readNotion(env:ServerEnv){
  if(!env.NOTION_DATA_SOURCE_ID)throw new ApiError(503,'Configure Notion data source ID');
  const pages:Page[]=[];let cursor:string|undefined;do{const result=await notion(env,`data_sources/${encodeURIComponent(env.NOTION_DATA_SOURCE_ID)}/query`,'POST',{page_size:100,...(cursor?{start_cursor:cursor}:{})});if(!Array.isArray(result.results))throw new ApiError(502,'Invalid Notion response');pages.push(...result.results);if(pages.length>200)throw new ApiError(422,'Notion session supports at most 200 tasks');cursor=result.has_more?result.next_cursor:undefined;}while(cursor);
  const availability=z.array(z.object({person:z.enum(['Lea','Jonas','Mira','Unassigned']),skill:z.array(z.string()),start:z.string().datetime({offset:true}),end:z.string().datetime({offset:true})})).min(1).parse(JSON.parse(env.NOTION_AVAILABILITY_JSON||'null'));
- const training=pages.filter(p=>p.properties.TrainingStage?.select?.name?.startsWith('Training'));const heldout=pages.filter(p=>p.properties.TrainingStage?.select?.name==='Tutor Test');if(!training.length||!heldout.length)throw new ApiError(422,'Need TrainingStage Training and Tutor Test rows');
+ const stage=(p:Page)=>(p.properties[propertyMap(env).trainingStage]??p.properties.TrainingStage)?.select?.name;
+ const training=pages.filter(p=>stage(p)?.startsWith('Training'));const heldout=pages.filter(p=>stage(p)==='Tutor Test');if(!training.length||!heldout.length)throw new ApiError(422,'Need TrainingStage Training and Tutor Test rows');
  return {tasks:training.map(p=>mapNotionPage(p,propertyMap(env))),heldout:heldout.map(p=>mapNotionPage(p,propertyMap(env))),availability,pages};
 }
 export async function writeNotionTask(env:ServerEnv,task:Task){

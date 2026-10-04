@@ -1,0 +1,3 @@
+import {expect,it} from 'vitest';
+import {mediaError} from './media-errors';
+it('offers actionable permission and missing-device retries without provider payloads',()=>{expect(mediaError(new DOMException('denied','NotAllowedError'),'screen')).toContain('Screen Recording permission');expect(mediaError(new DOMException('denied','NotAllowedError'),'voice')).toContain('Allow the microphone');expect(mediaError(new DOMException('missing','NotFoundError'),'voice')).toContain('No microphone');expect(mediaError(new Error('private provider payload'),'voice')).not.toContain('private provider payload');});

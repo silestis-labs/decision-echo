@@ -1,5 +1,11 @@
 import { z } from 'zod';
 export class ApiError extends Error { constructor(public status:number, message:string,public retryAfter?:string){super(message)} }
+/** Public installations must explicitly gate creation of provider-backed sessions. */
+export function requiresDemoAccess(origin:string,code?:string,requestOrigin=origin){
+ if(code)return true;
+ const local=(value:string)=>{try{const url=new URL(value);return ['http:','https:'].includes(url.protocol)&&['127.0.0.1','localhost','[::1]'].includes(url.hostname);}catch{return false;}};
+ return !local(origin)||!local(requestOrigin);
+}
 export async function digest(token:string){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(token)))].map(x=>x.toString(16).padStart(2,'0')).join('')}
 export async function readBody(request:Request,max=1_500_000):Promise<unknown>{
  if(!request.headers.get('content-type')?.startsWith('application/json'))throw new ApiError(415,'JSON required');

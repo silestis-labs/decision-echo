@@ -1,15 +1,23 @@
-import { WorkMapSchema, type Availability, type Evidence, type Finding, type Session, type Task, type Validation, type WorkMap } from '../shared/contracts';
+import { TaskSchema, WorkMapSchema, type Availability, type Evidence, type Finding, type Rule, type Session, type Task, type Validation, type WorkMap } from '../shared/contracts';
 
 const at = (day:number,hour:number) => `2026-10-${String(day).padStart(2,'0')}T${String(hour).padStart(2,'0')}:00:00+02:00`;
 const time = (value:string|null) => value ? Date.parse(value) : NaN;
 const hours = (start:string|null,end:string|null) => (time(end)-time(start))/3600000;
 const overlap = (a:string|null,b:string|null,c:string|null,d:string|null) => time(a)<time(d) && time(c)<time(b);
+const berlinClock=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hourCycle:'h23'});
+function morningStart(value:string|null){
+  if(!Number.isFinite(time(value)))return false;
+  const parts=berlinClock.formatToParts(new Date(value!));
+  return Number(parts.find(p=>p.type==='hour')?.value)<12;
+}
 export function sandboxAvailability():Availability[] {
   return [
     {person:'Lea',skill:['Data Analysis'],start:at(7,9),end:at(7,11)},
     {person:'Lea',skill:['Data Analysis'],start:at(8,9),end:at(8,13)},
     {person:'Lea',skill:['Data Analysis'],start:at(9,8),end:at(9,12)},
+    {person:'Jonas',skill:['Client Communication'],start:at(7,9),end:at(7,12)},
     {person:'Jonas',skill:['Client Communication'],start:at(7,13),end:at(7,17)},
+    {person:'Jonas',skill:['Client Communication'],start:at(8,8),end:at(8,12)},
     {person:'Jonas',skill:['Client Communication'],start:at(8,13),end:at(8,17)},
     {person:'Jonas',skill:['Client Communication'],start:at(9,8),end:at(9,12)},
     {person:'Mira',skill:['Quality Review'],start:at(8,9),end:at(8,12)},
@@ -17,16 +25,28 @@ export function sandboxAvailability():Availability[] {
   ];
 }
 export function sandboxTasks():Task[] {
-  const base = {skill:'Data Analysis',effort:4,priority:2,customerPreference:'No preference',dependencyStatus:'Ready' as const,dependencyAvailableAt:null,focus:true,external:false,reviewOwner:'None' as const,reviewStart:null,reviewEnd:null,followUpOwner:'',followUpCheckpoint:null,decision:'Schedule' as const};
+  const base = {customer:'Internal',description:'',dependency:'',trainingStage:'',timeWindow:'Flexible',planningWeek:'W41 · 5–9 Oct',reviewStatus:'Not required' as const,skill:'Data Analysis',effort:4,priority:2,customerPreference:'No preference',dependencyStatus:'Ready' as const,dependencyAvailableAt:null,focus:true,external:false,reviewOwner:'None' as const,reviewStart:null,reviewEnd:null,followUpOwner:'',followUpCheckpoint:null,decision:'Schedule' as const};
   return [
-    {...base,id:'cohort',title:'Analyze Cohort Data',deadline:at(9,17),assignee:'Lea',start:at(8,9),end:at(8,13)},
-    {...base,id:'presentation',title:'Finalize Client Presentation',skill:'Client Communication',effort:3,deadline:at(8,12),priority:1,customerPreference:'Jonas only',focus:false,external:true,assignee:'Jonas',start:at(7,14),end:at(7,17),reviewOwner:'Mira',reviewStart:at(8,9),reviewEnd:at(8,10)},
-    {...base,id:'market',title:'Update Market Analysis',effort:3,deadline:at(9,16),dependencyStatus:'Blocked',assignee:'Unassigned',start:null,end:null,decision:'Request information',followUpOwner:'Jonas',followUpCheckpoint:at(8,10)},
-    {...base,id:'atlas',title:'Atlas Data Correction',effort:2,deadline:at(8,12),priority:0,customerPreference:'Lea only',dependencyAvailableAt:at(7,16),focus:false,assignee:'Unassigned',start:null,end:null,decision:'Hold'},
+    {...base,id:'cohort',trainingStage:'Training 1',description:'Four hours of focused analysis; output is internal.',dependency:'The complete dataset is available.',timeWindow:'Morning only',title:'Analyze Cohort Data',deadline:at(9,17),assignee:'Lea',start:at(8,9),end:at(8,13)},
+    {...base,id:'presentation',customer:'Northstar',trainingStage:'Training 2',description:'Presentation for an external client meeting; independent review required.',dependency:'All content is available. Review must be completed before delivery.',reviewStatus:'Planned',title:'Finalize Client Presentation',skill:'Client Communication',effort:3,deadline:at(8,12),priority:1,customerPreference:'Jonas only',focus:false,external:true,assignee:'Jonas',start:at(7,14),end:at(7,17),reviewOwner:'Mira',reviewStart:at(8,9),reviewEnd:at(8,10)},
+    {...base,id:'market',customer:'Internal Strategy',trainingStage:'Training 3',description:'The market analysis cannot be completed reliably without current customer data.',dependency:'Current customer data is missing; follow-up with the Account Owner is required.',focus:false,title:'Update Market Analysis',effort:3,deadline:at(9,16),dependencyStatus:'Blocked',assignee:'Unassigned',start:null,end:null,decision:'Request information',followUpOwner:'Account Owner',followUpCheckpoint:at(8,10)},
+    {...base,id:'atlas',customer:'Atlas',trainingStage:'Advanced Test',description:'Urgent data correction requiring replanning of the whole week.',dependency:'The release file is expected Wednesday at 16:00.',timeWindow:'Morning only',title:'Atlas Data Correction',effort:2,deadline:at(8,12),priority:0,customerPreference:'Lea only',dependencyAvailableAt:at(7,16),focus:false,assignee:'Unassigned',start:null,end:null,decision:'Hold'},
   ];
 }
 export function createSandboxSession(id:string,mode:'sandbox'|'live'):Session {
-  return {progress:{checks:0,blockedChecks:0,encounteredRuleIds:[],resolvedRuleIds:[]},id,mode,epoch:0,recording:false,phase:'capture',evidence:[],answers:[],map:null,tasks:sandboxTasks(),availability:sandboxAvailability(),validation:null,commitStatus:'idle',revision:0};
+  return {templateVersion:1,progress:{checks:0,blockedChecks:0,encounteredRuleIds:[],resolvedRuleIds:[]},id,mode,epoch:0,recording:false,phase:'capture',evidence:[],answers:[],map:null,tasks:sandboxTasks(),availability:sandboxAvailability(),validation:null,commitStatus:'idle',revision:0};
+}
+
+/** Upgrade only untouched legacy fixtures; preserve recorded and committed sessions as historical evidence. */
+export function upgradeSandboxTemplate(session:Session):Session {
+  const tasks=session.tasks.map(t=>TaskSchema.parse(t));
+  if(session.mode!=='sandbox'||session.templateVersion===1||session.answers.length||session.evidence.length||session.recording||session.map||session.phase!=='capture'||session.commitStatus!=='idle')return {...session,tasks};
+  const seeds=sandboxTasks();
+  if(tasks.some(t=>!seeds.some(seed=>seed.id===t.id)))return {...session,tasks};
+  return {...session,templateVersion:1,availability:sandboxAvailability(),tasks:tasks.map(t=>{
+    const seed=seeds.find(seed=>seed.id===t.id)!;
+    return {...t,customer:seed.customer,description:seed.description,dependency:seed.dependency,trainingStage:seed.trainingStage,timeWindow:seed.timeWindow,planningWeek:seed.planningWeek,reviewStatus:seed.reviewStatus};
+  })};
 }
 
 const descriptions:Record<string,[string,string]> = {
@@ -61,6 +81,12 @@ export function validatePlan(tasks:Task[],availability:Availability[],map:WorkMa
     const rule=map.rules.find(r=>r.id===ruleId);
     findings.push({ruleId,taskIds,message,severity,expertQuote:rule?.expertQuote??'',evidenceIds:rule?.evidenceIds??[]});
   };
+  // Explicit application facts remain binding even when the expert did not teach a
+  // matching operator. Keep these findings separate from learned expert evidence;
+  // when that operator exists, its normal finding below explains the same conflict.
+  const source=(kind:Rule['kind'],task:Task,message:string)=>{
+    if(!map.rules.some(r=>r.kind===kind))add('system',[task.id],`Source constraint: ${message}`);
+  };
   // Structural integrity is always enforced. Domain judgments below depend on confirmed learned rules.
   if(map.status!=='confirmed') add('system',[],'The expert must confirm this Work Map before tutoring or saving.');
   if(new Set(tasks.map(t=>t.id)).size!==tasks.length) add('system',[],'Duplicate task IDs are not allowed.');
@@ -76,6 +102,12 @@ export function validatePlan(tasks:Task[],availability:Availability[],map:WorkMa
     if(!Number.isFinite(time(task.start))||!Number.isFinite(time(task.end))||time(task.start)>=time(task.end)||task.assignee==='Unassigned') add('system',[task.id],'A scheduled task needs an assignee and valid start and end.');
     if(time(task.end)>time(task.deadline)) add('system',[task.id],'Work ends after its deadline.');
     if(Number.isFinite(hours(task.start,task.end))&&hours(task.start,task.end)<task.effort) add('system',[task.id],'The allocated slot is shorter than the estimated effort.');
+    if(task.customerPreference.endsWith(' only')&&task.assignee!==task.customerPreference.slice(0,-5))source('customer_only',task,`${task.customerPreference} is a required assignment.`);
+    if(availability.length&&!availability.some(a=>a.person===task.assignee&&time(task.start)>=time(a.start)&&time(task.end)<=time(a.end)))source('availability',task,`${task.title} falls outside ${task.assignee}'s supplied availability.`);
+    if(task.dependencyStatus!=='Ready'||(task.dependencyAvailableAt&&time(task.start)<time(task.dependencyAvailableAt)))source('dependency_ready',task,'The dependency is not available before the planned start.');
+    // The reference analysis slot is 09–13. "Morning only" consequently constrains
+    // its start, rather than inventing a noon finish cutoff that contradicts it.
+    if(task.timeWindow.trim().toLowerCase()==='morning only'&&Number.isFinite(time(task.start))&&!morningStart(task.start))add('system',[task.id],'Source constraint: Morning only work must start before 12:00 in Europe/Berlin.');
   }
   for(const rule of map.rules){
     for(const task of tasks){

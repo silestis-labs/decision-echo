@@ -2,8 +2,8 @@ import { Hono } from 'hono';
 import { DurableObject } from 'cloudflare:workers';
 import { z } from 'zod';
 import { AnswerSchema,TaskSchema,WorkMapSchema,RuleSchema,type Session,type Task } from '../shared/contracts';
-import { createSandboxSession,compileMap,validatePlan,exportSkill } from '../domain/planning';
-import { ApiError,digest,constantEqual,readBody,imageSchema } from './safety';
+import { createSandboxSession,upgradeSandboxTemplate,compileMap,validatePlan,exportSkill } from '../domain/planning';
+import { ApiError,digest,constantEqual,readBody,imageSchema,requiresDemoAccess } from './safety';
 import { capabilities,voiceUrl,observe,coachLearner,liveCompile,readNotion,writeNotionTask,type ServerEnv } from './providers';
 const app=new Hono<{Bindings:ServerEnv}>();
 app.use('/api/*',async(c,next)=>{
@@ -14,10 +14,13 @@ app.use('/api/*',async(c,next)=>{
  await next();
 });
 app.onError((error,c)=>{if(error instanceof ApiError){if(error.retryAfter)c.header('Retry-After',error.retryAfter);return c.json({error:error.message},error.status as 400)}if(error instanceof z.ZodError)return c.json({error:'Invalid request or provider schema'},422);return c.json({error:'Internal server error'},500)});
-app.get('/api/config',c=>c.json(capabilities(c.env)));
+app.get('/api/config',c=>c.json(capabilities(c.env,new URL(c.req.url).origin)));
 app.post('/api/sessions',async c=>{
- // Optional shared code for a public deployment: session creation is what consumes provider credits.
- if(c.env.DEMO_ACCESS_CODE&&!constantEqual(c.req.header('X-Demo-Access')??'',c.env.DEMO_ACCESS_CODE))throw new ApiError(401,'Demo access code required');
+ // Fail closed outside local development: new capabilities permit paid provider calls.
+ if(requiresDemoAccess(c.env.APP_ORIGIN,c.env.DEMO_ACCESS_CODE,new URL(c.req.url).origin)){
+  if(!c.env.DEMO_ACCESS_CODE)throw new ApiError(503,'Configure a demo access code before accepting public sessions');
+  if(!constantEqual(c.req.header('X-Demo-Access')??'',c.env.DEMO_ACCESS_CODE))throw new ApiError(401,'Demo access code required');
+ }
  const {mode}=z.object({mode:z.enum(['sandbox','live'])}).strict().parse(await readBody(c.req.raw,2000));
  if(mode==='live'&&!capabilities(c.env).notion)throw new ApiError(503,'Live mode requires Notion configuration and explicit availability');
  const id=crypto.randomUUID(), token=crypto.randomUUID()+crypto.randomUUID();
@@ -54,7 +57,7 @@ function mergeProposal(base:Task[],proposal:Task[]):Task[]{
 }
 export class EchoSession extends DurableObject<ServerEnv>{
  constructor(ctx:DurableObjectState,env:ServerEnv){super(ctx,env);ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS session_state (id INTEGER PRIMARY KEY CHECK(id=1), data TEXT NOT NULL, token_hash TEXT NOT NULL)');ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS frame_assets (id TEXT PRIMARY KEY, image TEXT NOT NULL)');ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS write_journal (id TEXT PRIMARY KEY, task_id TEXT NOT NULL, status TEXT NOT NULL, at TEXT NOT NULL)')}
- private load(){const row=this.ctx.storage.sql.exec<{data:string;token_hash:string}>('SELECT data,token_hash FROM session_state WHERE id=1').toArray()[0];if(!row)throw new ApiError(404,'Session not found');return {session:JSON.parse(row.data) as Session,hash:row.token_hash}}
+ private load(){const row=this.ctx.storage.sql.exec<{data:string;token_hash:string}>('SELECT data,token_hash FROM session_state WHERE id=1').toArray()[0];if(!row)throw new ApiError(404,'Session not found');return {session:upgradeSandboxTemplate(JSON.parse(row.data) as Session),hash:row.token_hash}}
  private save(session:Session){for(const e of session.evidence)if(e.image)this.ctx.storage.sql.exec('INSERT OR IGNORE INTO frame_assets(id,image) VALUES(?,?)',e.id,e.image);const metadata={...session,evidence:session.evidence.map(({image,...e})=>e)};this.ctx.storage.sql.exec('UPDATE session_state SET data=? WHERE id=1',JSON.stringify(metadata))}
  private async refreshLease(){const expiresAt=Date.now()+CAPTURE_LEASE_MS;await this.ctx.storage.put('capture_lease',expiresAt);await this.ctx.storage.setAlarm(expiresAt);return expiresAt}
  private async expireLease(){const expiresAt=await this.ctx.storage.get<number>('capture_lease');const s=this.load().session;if(s.recording&&(!expiresAt||expiresAt<=Date.now())){s.recording=false;s.epoch++;s.revision++;this.save(s);await this.ctx.storage.delete('capture_lease');return true}return false}

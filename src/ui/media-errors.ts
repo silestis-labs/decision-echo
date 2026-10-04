@@ -1,0 +1,8 @@
+/** Convert provider/device errors to a retry the user can actually perform. Never echo arbitrary provider payloads. */
+export function mediaError(error:unknown,kind:'screen'|'voice'):string{
+ const name=error instanceof Error?error.name:'';const text=error instanceof Error?error.message:String(error);const denied=name==='NotAllowedError'||name==='PermissionDeniedError'||/permission|denied|notallowed/i.test(text);
+ if(kind==='screen'){if(denied||name==='AbortError')return 'Screen sharing was canceled or denied. Click Share screen to try again and select the intended window or tab. Check your browser and macOS Screen Recording permission if no window is available.';if(name==='NotFoundError'||name==='NotReadableError')return 'The selected screen cannot be read. Close the picker and try Share screen again with another window; check macOS Screen Recording permission.';return 'Screen capture could not start. Try Share screen again; your unsaved answer remains available.';}
+ if(denied)return 'Microphone access was denied. Allow the microphone for this site in browser settings, then click Connect voice again. Your unsaved answer remains available.';
+ if(name==='NotFoundError'||/no.*microphone|device.*not.*found|requested device not found/i.test(text))return 'No microphone was found. Connect or select a microphone in browser settings, then click Connect voice again. You can still type and save your answer.';
+ return 'The voice connection failed or disconnected. Click Connect voice again while screen capture is active. Your unsaved answer remains available; review the transcript before continuing.';
+}
